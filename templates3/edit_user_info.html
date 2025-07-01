@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Edit User Info</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+  <div class="container mt-4">
+    <h2>Edit User Information</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div>
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    <form method="POST" action="{{ url_for('edit_user_info', uid=user.uid) }}">
+      <input type="hidden" name="uid" value="{{ user.uid }}" />
+      <div class="mb-3">
+        <label for="name" class="form-label">Name</label>
+        <input type="text" class="form-control" id="name" name="name" value="{{ user.name }}" required />
+      </div>
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required />
+      </div>
+      <div class="mb-3">
+        <label for="phone" class="form-label">Phone</label>
+        <input type="text" class="form-control" id="phone" name="phone" value="{{ user.phone or '' }}" />
+      </div>
+      <!-- Country field removed as per request -->
+      <button type="button" class="btn btn-secondary mb-3" id="toggle-password-btn">Change Password</button>
+      <br />
+      <div class="mb-3" id="current-password-container" style="display:none;">
+        <label for="current_password" class="form-label">Current Password</label>
+        <input type="password" class="form-control" id="current_password" name="current_password" />
+      </div>
+      <div class="mb-3" id="new-password-container" style="display:none;">
+        <label for="new_password" class="form-label">New Password</label>
+        <input type="password" class="form-control" id="new_password" name="new_password" />
+      </div>
+      <div class="mb-3" id="confirm-password-container" style="display:none;">
+        <label for="confirm_password" class="form-label">Confirm New Password</label>
+        <input type="password" class="form-control" id="confirm_password" name="confirm_password" />
+      </div>
+      <button type="submit" class="btn btn-primary">Update</button>
+      <a href="{{ url_for('viewuser') }}" class="btn btn-secondary ms-2">Cancel</a>
+    </form>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const toggleBtn = document.getElementById('toggle-password-btn');
+      const currentPasswordContainer = document.getElementById('current-password-container');
+      const newPasswordContainer = document.getElementById('new-password-container');
+      const confirmPasswordContainer = document.getElementById('confirm-password-container');
+      toggleBtn.addEventListener('click', function() {
+        if (currentPasswordContainer.style.display === 'none') {
+          currentPasswordContainer.style.display = 'block';
+          toggleBtn.textContent = 'Cancel Password Change';
+        } else {
+          currentPasswordContainer.style.display = 'none';
+          newPasswordContainer.style.display = 'none';
+          confirmPasswordContainer.style.display = 'none';
+          toggleBtn.textContent = 'Change Password';
+          document.getElementById('current_password').value = '';
+          document.getElementById('new_password').value = '';
+          document.getElementById('confirm_password').value = '';
+        }
+      });
+
+      // Show new password fields when current password is entered
+      document.getElementById('current_password').addEventListener('input', function() {
+        if (this.value.length > 0) {
+          newPasswordContainer.style.display = 'block';
+          confirmPasswordContainer.style.display = 'block';
+        } else {
+          newPasswordContainer.style.display = 'none';
+          confirmPasswordContainer.style.display = 'none';
+        }
+      });
+    });
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

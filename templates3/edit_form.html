@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Edit Submission - {{ form_title }} (ID: {{ form_id }})</title> 
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    .btn, .btn-group .btn {
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn:hover, .btn:focus {
+      transform: translateY(-2px) scale(1.04);
+      box-shadow: 0 6px 18px rgba(118,75,162,0.12);
+    }
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.7s forwards;
+    }
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+    .toast {
+      animation: slideInRight 0.5s;
+    }
+    @keyframes slideInRight {
+      from { transform: translateX(100px); opacity: 0; }
+      to   { transform: none; opacity: 1; }
+    }
+    .floating-shape {
+      position: fixed;
+      top: 10%;
+      left: 80%;
+      width: 120px;
+      height: 120px;
+      background: radial-gradient(circle, #764ba2 60%, #667eea 100%);
+      border-radius: 50%;
+      opacity: 0.15;
+      animation: floatY 6s ease-in-out infinite alternate;
+      z-index: 0;
+    }
+    @keyframes floatY {
+      from { transform: translateY(0); }
+      to   { transform: translateY(40px); }
+    }
+  </style>
+</head>
+<body>
+ {{ navbar|safe }}<style>
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: 'Poppins', sans-serif;
+      color: #333;
+      min-height: 100vh;
+      padding-top: 3rem;
+      padding-bottom: 3rem;
+    }
+    .container {
+      max-width: 900px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 2rem 3rem 3rem 3rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+  </style>
+  <!-- Bootstrap CSS -->
+  <div class="container mt-5">
+    <h1 class="mb-4">Edit Submission for "{{ form_title }}" (ID: {{ form_id }})</h1>
+    <form method="POST">
+      {% for field in allowed_fields %}
+        <div class="mb-3">
+          <label for="{{ field.name }}" class="form-label">{{ field.label or field.name }}</label>
+          {% if field.type == 'textarea' %}
+            <textarea id="{{ field.name }}" name="{{ field.name }}" class="form-control" placeholder="{{ field.placeholder or '' }}">{{ submission_dict.get(field.name, '') }}</textarea>
+          {% elif field.type == 'select' %}
+            <select id="{{ field.name }}" name="{{ field.name }}" class="form-select">
+              {% for option in field.options %}
+                <option value="{{ option }}" {% if submission_dict.get(field.name, '') == option %} selected {% endif %}>{{ option }}</option>
+              {% endfor %}
+            </select>
+          {% elif field.type == 'radio' %}
+            {% for option in field.options %}
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="{{ field.name }}" id="{{ field.name }}_{{ loop.index }}" value="{{ option }}"
+                  {% if submission_dict.get(field.name, '') == option %} checked {% endif %}>
+                <label class="form-check-label" for="{{ field.name }}_{{ loop.index }}">{{ option }}</label>
+              </div>
+            {% endfor %}
+          {% elif field.type == 'checkbox' %}
+            {% set current = submission_dict.get(field.name, '') %}
+            {% set current_values = current.split(',') %}
+            {% for option in field.options %}
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="{{ field.name }}" id="{{ field.name }}_{{ loop.index }}" value="{{ option }}"
+                  {% if option in current_values %} checked {% endif %}>
+                <label class="form-check-label" for="{{ field.name }}_{{ loop.index }}">{{ option }}</label>
+              </div>
+            {% endfor %}
+          {% else %}
+            <!-- Covers other types e.g. text, email, number, date, etc. -->
+            <input type="{{ field.type }}" id="{{ field.name }}" name="{{ field.name }}" class="form-control" placeholder="{{ field.placeholder or '' }}"
+                   value="{{ submission_dict.get(field.name, '') }}">
+          {% endif %}
+        </div>
+      {% endfor %}
+      <button type="submit" class="btn btn-primary">Save Changes</button>
+      <a href="{{ url_for('view_response', form_id=form_id, response_id=response_id) }}" class="btn btn-secondary">Cancel</a>
+    </form>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

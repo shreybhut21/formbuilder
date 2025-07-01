@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Edit Field - {{ form_title }}</title>
+  <style>
+    .btn, .btn-group .btn {
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn:hover, .btn:focus {
+      transform: translateY(-2px) scale(1.04);
+      box-shadow: 0 6px 18px rgba(118,75,162,0.12);
+    }
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.7s forwards;
+    }
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+    .toast {
+      animation: slideInRight 0.5s;
+    }
+    @keyframes slideInRight {
+      from { transform: translateX(100px); opacity: 0; }
+      to   { transform: none; opacity: 1; }
+    }
+    .floating-shape {
+      position: fixed;
+      top: 10%;
+      left: 80%;
+      width: 120px;
+      height: 120px;
+      background: radial-gradient(circle, #764ba2 60%, #667eea 100%);
+      border-radius: 50%;
+      opacity: 0.15;
+      animation: floatY 6s ease-in-out infinite alternate;
+      z-index: 0;
+    }
+    @keyframes floatY {
+      from { transform: translateY(0); }
+      to   { transform: translateY(40px); }
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+  <div class="container mt-5">
+    <h1>Edit Field for "{{ form_title }}"</h1>
+    <form method="POST">
+      <!-- Field Label -->
+      <div class="mb-3">
+        <label for="label" class="form-label">Label</label>
+        <input type="text" class="form-control" id="label" name="label" 
+               placeholder="Enter label" value="{{ field.label }}">
+      </div>
+      
+      <!-- Field Name -->
+      <div class="mb-3">
+        <label for="name" class="form-label">Field Name</label>
+        <input type="text" class="form-control" id="name" name="name" 
+               placeholder="Enter field name" value="{{ field.name }}">
+      </div>
+      
+      <!-- Placeholder -->
+      <div class="mb-3">
+        <label for="placeholder" class="form-label">Placeholder</label>
+        <input type="text" class="form-control" id="placeholder" name="placeholder" 
+               placeholder="Enter placeholder" value="{{ field.placeholder }}">
+      </div>
+      
+      <!-- Default Value -->
+      <div class="mb-3">
+        <label for="value" class="form-label">Default Value</label>
+        <input type="text" class="form-control" id="value" name="value" 
+               placeholder="Enter default value" value="{{ field.value or '' }}">
+      </div>
+
+      <!-- Maximum Length -->
+      <div class="mb-3">
+        <label for="maxlength" class="form-label">Max Length</label>
+        <input type="text" class="form-control" id="maxlength" name="maxlength" 
+               placeholder="Enter maximum length" value="{{ field.maxlength or '' }}">
+      </div>
+
+      <!-- Minimum Length -->
+      <div class="mb-3">
+        <label for="minlength" class="form-label">Min Length</label>
+        <input type="text" class="form-control" id="minlength" name="minlength" 
+               placeholder="Enter minimum length" value="{{ field.minlength or '' }}">
+      </div>
+
+      <!-- Required (Checkbox) -->
+      <div class="mb-3 form-check">
+        <input type="checkbox" class="form-check-input" id="required" name="required"
+               {% if field.required == "required" %}checked{% endif %}>
+        <label class="form-check-label" for="required">Required</label>
+      </div>
+
+      <!-- Description Field (if you want to include one) -->
+      <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
+        <input type="text" class="form-control" id="description" name="description" 
+               placeholder="Enter description" value="{{ field.description or '' }}">
+      </div>
+
+      <!-- Options for radio/checkbox/select types -->
+      {% if field.type in ["radio", "checkbox", "select"] %}
+      <div class="mb-3">
+        <label for="options" class="form-label">Options (comma separated)</label>
+        <input type="text" class="form-control" id="options" name="options" 
+               placeholder="Enter options" value="{{ field.options | join(', ') }}">
+      </div>
+      {% endif %}
+
+      <button type="submit" class="btn btn-primary">Save Changes</button>
+      <a href="{{ url_for('view_layout', form_id=form_id) }}" class="btn btn-secondary">Cancel</a>
+    </form>
+  </div>
+</body>
+</html>

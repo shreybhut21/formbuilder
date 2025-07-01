@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Form Builder Pro</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: 'Poppins', sans-serif;
+      color: #333;
+      min-height: 100vh;
+    }
+    .builder-card {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      margin-top: 0.5rem;
+      opacity: 0;
+      transform: translateY(30px) scale(0.98);
+      animation: fadeInCard 0.7s forwards;
+      animation-delay: 0.2s;
+    }
+    .form-preview-card {
+      height: 100%;
+    }
+    .form-control, .form-select {
+      border-radius: 8px;
+      border: 1px solid #ced4da;
+      transition: all 0.2s ease-in-out;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: #764ba2;
+      box-shadow: 0 0 0 0.25rem rgba(118, 75, 162, 0.25);
+    }
+    .btn-primary {
+      background-color: #6a5acd; /* SlateBlue */
+      border: none;
+      transition: all 0.2s ease-in-out;
+    }
+    .btn-primary:hover {
+      background-color: #5a4ab5;
+      transform: translateY(-2px);
+    }
+    .field-list-item {
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      padding: 10px 
+      <edit_file>
+<content>
+  <style>
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: 'Poppins', sans-serif;
+      color: #333;
+      min-height: 100vh;
+    }
+    .builder-card {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      margin-top: 0.5rem;
+    }
+    .form-preview-card {
+      height: 100%;
+    }
+    .form-control, .form-select {
+      border-radius: 8px;
+      border: 1px solid #ced4da;
+      transition: all 0.2s ease-in-out;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: #764ba2;
+      box-shadow: 0 0 0 0.25rem rgba(118, 75, 162, 0.25);
+    }
+    .btn-primary {
+      background-color: #6a5acd; /* SlateBlue */
+      border: none;
+      transition: all 0.2s ease-in-out;
+    }
+    .btn-primary:hover {
+      background-color: #5a4ab5;
+      transform: translateY(-2px);
+    }
+    .field-list-item {
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      padding: 10px 15px;
+      margin-bottom: 10px;
+      transition: box-shadow 0.2s;
+    }
+    .field-list-item:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    .field-attribute {
+      display: none; /* All specific attribute sections start hidden */
+    }
+    hr {
+      opacity: 0.25;
+    }
+    .form-check-label {
+      cursor: pointer;
+    }
+  </style>
+  <style>
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: 'Poppins', sans-serif;
+      color: #333;
+      min-height: 100vh;
+    }
+    .builder-card {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      margin-top: 0.5rem;
+      opacity: 0;
+      transform: translateY(30px) scale(0.98);
+      animation: fadeInCard 0.7s forwards;
+      animation-delay: 0.2s;
+    }
+    .form-preview-card {
+      height: 100%;
+    }
+    .form-control, .form-select {
+      border-radius: 8px;
+      border: 1px solid #ced4da;
+      transition: all 0.2s ease-in-out;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: #764ba2;
+      box-shadow: 0 0 0 0.25rem rgba(118, 75, 162, 0.25);
+    }
+    .btn-primary {
+      background-color: #6a5acd; /* SlateBlue */
+      border: none;
+      transition: all 0.2s ease-in-out;
+    }
+    .btn-primary:hover {
+      background-color: #5a4ab5;
+      transform: translateY(-2px);
+    }
+    .field-list-item {
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      padding: 10px 15px;
+      margin-bottom: 10px;
+      transition: box-shadow 0.2s;
+    }
+    .field-list-item:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    .field-attribute {
+      display: none; /* All specific attribute sections start hidden */
+    }
+    hr {
+      opacity: 0.25;
+    }
+    .form-check-label {
+      cursor: pointer;
+    }
+    @keyframes fadeInCard {
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  {{ navbar | safe }}
+
+  <div class="container-fluid py-4">
+    <div class="row gx-4">
+      <!-- Left Column: Field Editor -->
+      <div class="col-lg-5">
+        <div class="builder-card">
+          <form method="POST" id="field-form">
+            <input type="hidden" name="edit_index" value="{{ request.args.get('edit', '') }}">
+
+            <h3 class="mb-4 fw-bold">
+              {% if editing_field %}
+                <i class="bi bi-pencil-square me-2"></i>Edit Field
+              {% else %}
+                <i class="bi bi-plus-circle-dotted me-2"></i>Add a New Field
+              {% endif %}
+            </h3>
+
+            <!-- Core Fields -->
+            <div id="access-wrapper" class="mb-3">
+              <label for="access" class="form-label fw-medium">Access Level</label>
+              <select id="access" name="access" class="form-control" form="create-form" required>
+                <option value="public" {% if editing_field and editing_field.access == 'public' %}selected{% endif %}>Public</option>
+                <option value="private" {% if editing_field and editing_field.access == 'private' %}selected{% endif %}>Private</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="label" class="form-label fw-medium">Box Name</label>
+              <input id="label" name="label" class="form-control" required value="{{ editing_field.label if editing_field else '' }}">
+            </div>
+            <div class="mb-3">
+              <label for="name" class="form-label fw-medium">Field Name 
+                <i class="bi bi-info-circle" title="Unique identifier for this field (e.g., 'user_email'). No spaces."></i>
+              </label>
+              <input id="name" name="name" class="form-control field-name-input" required value="{{ editing_field.name if editing_field else '' }}">
+            </div>
+            <div class="mb-3">
+              <label for="type" class="form-label fw-medium">Form Type</label>
+              <select id="type" name="type" class="form-select" onchange="toggleFieldAttributes()" required>
+                {% set types = ['text','email','password','number','date','time','textarea','select','radio','checkbox','range','color','file','url','tel','search','datetime-local','month','week'] %}
+                {% for t in types %}
+                  <option value="{{ t }}" {% if editing_field and editing_field.type == t %}selected{% endif %}>
+                    {{ t.replace('-', ' ').capitalize() }}
+                  </option><br><br>
+                {% endfor %}
+
+           
+
+
+            <div id="options-wrapper" class="field-attribute mb-3" style="display:none;">
+              <label class="form-label fw-medium">Options</label>
+              <input name="options" class="form-control" placeholder="e.g., Option 1, Option 2, Option 3"
+                     value="{{ editing_field.options | join(', ') if editing_field and editing_field.options else '' }}">
+              <div class="form-text">Comma-separated values for Select, Radio, or Checkbox types.</div>
+            </div>
+
+  <script>
+    function toggleFieldAttributes() {
+      const typeElement = document.getElementById('type');
+      if (!typeElement) return;
+      const type = typeElement.value;
+
+      // Only show options-wrapper for these types
+      const showOptionsFor = ['select', 'radio', 'checkbox'];
+
+      // Hide all attribute blocks
+      document.querySelectorAll('.field-attribute').forEach(el => {
+        el.style.display = 'none';
+      });
+
+      // Show options-wrapper only if type is in showOptionsFor
+      const optionsWrapper = document.getElementById('options-wrapper');
+      if (optionsWrapper) {
+        if (showOptionsFor.includes(type)) {
+          optionsWrapper.style.display = 'block';
+        } else {
+          optionsWrapper.style.display = 'none';
+        }
+      }
+
+      // Show other wrappers based on type
+      const typeConfig = {
+        text: ['text-validation-wrapper', 'placeholder-wrapper'],
+        textarea: ['text-validation-wrapper', 'placeholder-wrapper'],
+        password: ['text-validation-wrapper', 'placeholder-wrapper'],
+        email: ['placeholder-wrapper'],
+        url: ['placeholder-wrapper'],
+        tel: ['placeholder-wrapper'],
+        search: ['placeholder-wrapper'],
+        number: ['number-validation-wrapper', 'placeholder-wrapper'],
+        range: ['number-validation-wrapper'],
+        date: ['number-validation-wrapper'],
+        'datetime-local': ['number-validation-wrapper'],
+        month: ['number-validation-wrapper'],
+        week: ['number-validation-wrapper'],
+        time: ['number-validation-wrapper'],
+        select: ['access-wrapper'],
+        radio: ['access-wrapper'],
+        checkbox: ['access-wrapper']
+      };
+
+      // Show only the wrappers related to the selected type
+      const wrappersToShow = typeConfig[type] || [];
+      wrappersToShow.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.style.display = 'block';
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      toggleFieldAttributes();
+      const typeElement = document.getElementById('type');
+      if (typeElement) {
+        typeElement.removeEventListener('change', toggleFieldAttributes);
+        typeElement.addEventListener('change', toggleFieldAttributes);
+      }
+    });
+  </script>
+
+  <script>
+    function toggleFieldAttributes() {
+      const typeElement = document.getElementById('type');
+      if (!typeElement) return;
+      const type = typeElement.value;
+
+      // Only show options-wrapper for these types
+      const showOptionsFor = ['select', 'radio', 'checkbox'];
+
+      // Hide all attribute blocks
+      document.querySelectorAll('.field-attribute').forEach(el => {
+        el.style.display = 'none';
+      });
+
+      // Show options-wrapper only if type is in showOptionsFor
+      const optionsWrapper = document.getElementById('options-wrapper');
+      if (optionsWrapper) {
+        if (showOptionsFor.includes(type)) {
+          optionsWrapper.style.display = 'block';
+        } else {
+          optionsWrapper.style.display = 'none';
+        }
+      }
+
+      // Show other wrappers based on type
+      const typeConfig = {
+        text: ['text-validation-wrapper', 'placeholder-wrapper'],
+        textarea: ['text-validation-wrapper', 'placeholder-wrapper'],
+        password: ['text-validation-wrapper', 'placeholder-wrapper'],
+        email: ['placeholder-wrapper'],
+        url: ['placeholder-wrapper'],
+        tel: ['placeholder-wrapper'],
+        search: ['placeholder-wrapper'],
+        number: ['number-validation-wrapper', 'placeholder-wrapper'],
+        range: ['number-validation-wrapper'],
+        date: ['number-validation-wrapper'],
+        'datetime-local': ['number-validation-wrapper'],
+        month: ['number-validation-wrapper'],
+        week: ['number-validation-wrapper'],
+        time: ['number-validation-wrapper'],
+        select: ['access-wrapper'],
+        radio: ['access-wrapper'],
+        checkbox: ['access-wrapper']
+      };
+
+      // Show only the wrappers related to the selected type
+      const wrappersToShow = typeConfig[type] || [];
+      wrappersToShow.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.style.display = 'block';
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      toggleFieldAttributes();
+      const typeElement = document.getElementById('type');
+      if (typeElement) {
+        typeElement.removeEventListener('change', toggleFieldAttributes);
+        typeElement.addEventListener('change', toggleFieldAttributes);
+      }
+    });
+  </script>
+
+            <div id="text-validation-wrapper" class="field-attribute">
+              <div class="row">
+                <div class="col-6 mb-3">
+                  <label class="form-label fw-medium">Min Length</label>
+                  <input name="minlength" type="number" class="form-control" value="{{ editing_field.minlength if editing_field else '' }}">
+                </div>
+                <div class="col-6 mb-3">
+                  <label class="form-label fw-medium">Max Length</label>
+                  <input name="maxlength" type="number" class="form-control" value="{{ editing_field.maxlength if editing_field else '' }}">
+                </div>
+              </div>
+            </div>
+
+            <div id="number-validation-wrapper" class="field-attribute">
+              <div class="row">
+                <div class="col-6 mb-3">
+                  <label class="form-label fw-medium">Min Value</label>
+                  <input name="min" type="number" class="form-control" value="{{ editing_field.min if editing_field else '' }}">
+                </div>
+                <div class="col-6 mb-3">
+                  <label class="form-label fw-medium">Max Value</label>
+                  <input name="max" type="number" class="form-control" value="{{ editing_field.max if editing_field else '' }}">
+                </div>
+              </div>
+            </div>
+
+            <div id="placeholder-wrapper" class="field-attribute mb-3">
+              <label class="form-label fw-medium">Placeholder</label>
+              <input name="placeholder" class="form-control" value="{{ editing_field.placeholder if editing_field else '' }}">
+            </div>
+
+            <!-- Common Attributes -->
+            <div class="mb-3">
+              <label class="form-label fw-medium">Default Value</label>
+              <input name="value" class="form-control" value="{{ editing_field.value if editing_field else '' }}">
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-medium">Help Text / Description</label>
+              <input name="description" class="form-control" placeholder="Optional text to guide the user" value="{{ editing_field.description if editing_field else '' }}">
+            </div>
+            <div class="form-check mb-4">
+              <input type="checkbox" name="required" class="form-check-input" id="required"
+                     {% if editing_field and editing_field.required %}checked{% endif %}>
+              <label class="form-check-label" for="required">Required Field</label>
+            </div>
+
+            <!-- Actions -->
+            <div class="d-flex justify-content-end">
+              {% if editing_field %}
+                <a href="{{ url_for('firstpage') }}" class="btn btn-secondary me-2">Cancel Edit</a>
+              {% endif %}
+              <button type="submit" class="btn btn-primary px-4 fw-bold">
+                {{ 'Update Field' if editing_field else 'Add Field' }}
+                <i class="bi bi-arrow-right-circle ms-1"></i>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Right Column: Form Preview -->
+      <div class="col-lg-7">
+        <div class="builder-card form-preview-card">
+          <form id="create-form" method="POST" action="{{ url_for('create_form') }}">
+            <h3 class="mb-1 fw-bold"><i class="bi bi-card-list me-2"></i>Form Details</h3>
+            <p class="text-muted mb-4">Define your form's title and add fields from the left panel.</p>
+
+            <input type="hidden" name="form_fields" id="form_fields_input" value='{{ form_fields | tojson | safe }}'>
+            <input type="hidden" name="user_name" value="{{ session.get('username', 'Anonymous') }}">
+
+            <div class="mb-3">
+              <label class="form-label fw-medium">Form Title</label>
+              <input type="text" name="form_title" class="form-control" value="{{ title or '' }}" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-medium">Form Description</label>
+              <textarea name="form_description" class="form-control">{{ form_description or '' }}</textarea>
+            </div>
+            
+            <hr class="my-4">
+
+            <h5 class="mb-3 fw-bold">Current Fields ({{ form_fields|length }})</h5>
+            
+            <div id="sortable-fields" class="list-group list-group-flush">
+              {% if form_fields %}
+                {% for f in form_fields %}
+                  <div class="d-flex justify-content-between align-items-center field-list-item" id="field-item-{{ loop.index0 }}" data-index="{{ loop.index0 }}">
+                    <div>
+                      <span class="fw-medium">{{ f.label }}</span>
+                      <span class="badge bg-secondary fw-normal ms-2">{{ f['type'] }}</span>
+                      {% if f.required %}
+                        <span class="badge bg-warning text-dark fw-normal ms-1">Required</span>
+                      {% endif %}
+                    </div>
+                    <div class="d-flex align-items-center">
+                      <a href="{{ url_for('firstpage', edit=loop.index0) }}" class="btn btn-sm btn-outline-primary me-2" title="Edit">
+                        <i class="bi bi-pencil-square"></i>
+                      </a>
+            <button type="button" onclick="deleteFieldSession({{ loop.index0 }})" class="btn btn-sm btn-outline-danger" title="Delete">
+              <i class="bi bi-trash"></i>
+            </button>
+                    </div>
+                  </div>
+                {% endfor %}
+              {% else %}
+                <p class="text-center text-muted p-4 bg-light rounded-3">
+                  Your form has no fields yet. Use the "Add a New Field" panel on the left to get started.
+                </p>
+              {% endif %}
+            </div>
+
+            <div class="d-flex justify-content-between mt-4 pt-4 border-top">
+              <a href="{{ url_for('reset') }}" class="btn btn-outline-danger">
+                <i class="bi bi-arrow-counterclockwise me-1"></i> Reset All
+              </a>
+              <button type="submit" class="btn btn-lg btn-success" {% if not form_fields %}disabled{% endif %}>
+                <i class="bi bi-check-circle me-1"></i> Create My Form!
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+  <script>
+    // Store existing field names and labels from server-rendered data
+    const currentFieldNames = {{ form_fields | map(attribute='name') | list | tojson | safe }};
+    const currentFieldLabels = {{ form_fields | map(attribute='label') | list | tojson | safe }};
+    const editingFieldName = "{{ editing_field.name if editing_field else '' }}";
+    const editingFieldLabel = "{{ editing_field.label if editing_field else '' }}";
+
+    function toggleFieldAttributes() {
+      const typeElement = document.getElementById('type');
+      if (!typeElement) return;
+      const type = typeElement.value;
+
+      const typeConfig = {
+        text: ['text-validation-wrapper', 'placeholder-wrapper'],
+        textarea: ['text-validation-wrapper', 'placeholder-wrapper'],
+        password: ['text-validation-wrapper', 'placeholder-wrapper'],
+        email: ['placeholder-wrapper'],
+        url: ['placeholder-wrapper'],
+        tel: ['placeholder-wrapper'],
+        search: ['placeholder-wrapper'],
+        number: ['number-validation-wrapper', 'placeholder-wrapper'],
+        range: ['number-validation-wrapper'],
+        date: ['number-validation-wrapper'],
+        'datetime-local': ['number-validation-wrapper'],
+        month: ['number-validation-wrapper'],
+        week: ['number-validation-wrapper'],
+        time: ['number-validation-wrapper'],
+        select: ['options-wrapper', 'access-wrapper'],
+        radio: ['options-wrapper', 'access-wrapper'],
+        checkbox: ['options-wrapper', 'access-wrapper']
+      };
+
+      // Hide all attribute blocks
+      document.querySelectorAll('.field-attribute').forEach(el => {
+        el.style.display = 'none';
+      });
+      // Show only the wrappers related to the selected type
+      const wrappersToShow = typeConfig[type] || [];
+      wrappersToShow.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.style.display = 'block';
+        }
+      });
+    }
+
+    function deleteFieldSession(index) {
+      if (!confirm('Are you sure you want to delete this field?')) return;
+      fetch(`/delete_session_field/${index}`, { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'success') {
+            window.location.href = window.location.pathname;
+          } else {
+            alert(data.message || 'Failed to delete field.');
+          }
+        })
+        .catch(error => {
+          console.error('Error deleting field:', error);
+          alert('An error occurred while deleting the field.');
+        });
+    }
+
+    // Validate duplicate field names and labels in real time.
+    function checkDuplicateField() {
+      const nameInput = document.querySelector("input[name='name']");
+      const labelInput = document.querySelector("input[name='label']");
+      const nameValue = nameInput.value.trim();
+      const labelValue = labelInput.value.trim();
+
+      let nameValid = true;
+      let labelValid = true;
+
+      if (nameValue !== "" && currentFieldNames.includes(nameValue) && nameValue !== editingFieldName) {
+        nameInput.setCustomValidity("This field name is already in use. Please enter a unique name.");
+        nameValid = false;
+      } else {
+        nameInput.setCustomValidity("");
+      }
+
+      if (labelValue !== "" && currentFieldLabels.includes(labelValue) && labelValue !== editingFieldLabel) {
+        labelInput.setCustomValidity("This label is already in use. Please enter a unique label.");
+        labelValid = false;
+      } else {
+        labelInput.setCustomValidity("");
+      }
+
+      // Remove reportValidity calls to prevent cursor jump
+      // nameInput.reportValidity();
+      // labelInput.reportValidity();
+
+      // Optionally disable submit button if invalid
+      const submitBtn = document.querySelector("button[type='submit']");
+      if (submitBtn) {
+        submitBtn.disabled = !(nameValid && labelValid);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      toggleFieldAttributes();
+      const nameInput = document.querySelector("input[name='name']");
+      const labelInput = document.querySelector("input[name='label']");
+      if (nameInput) {
+        nameInput.addEventListener('input', checkDuplicateField);
+      }
+      if (labelInput) {
+        labelInput.addEventListener('input', checkDuplicateField);
+      }
+    });
+
+    // Initialize SortableJS on the field list
+    document.addEventListener('DOMContentLoaded', function () {
+      var sortable = new Sortable(document.getElementById('sortable-fields'), {
+        animation: 150,
+        handle: '.field-list-item',
+        onEnd: function (evt) {
+          // Get new order of field indices
+          var order = [];
+          document.querySelectorAll('#sortable-fields .field-list-item').forEach(function (el) {
+            order.push(el.getAttribute('data-index'));
+          });
+          // Send new order to server via fetch (POST)
+          fetch('/reorder_session_fields', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ order: order })
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.status !== 'success') {
+              alert('Failed to reorder fields.');
+            }
+          })
+          .catch(() => alert('Error reordering fields.'));
+        }
+      });
+    });
+  </script>
+
+  <script>
+    // Show/hide fields based on show_if conditions
+    function handleShowIf() {
+      const allFields = document.querySelectorAll('[data-show-if-field]');
+      allFields.forEach(field => {
+        const targetFieldName = field.getAttribute('data-show-if-field');
+        const targetFieldValue = field.getAttribute('data-show-if-value');
+        const targetField = document.querySelector(`[name="${targetFieldName}"]`);
+
+        function updateVisibility() {
+          if (!targetField) {
+            field.style.display = 'block'; // Show if target field not found
+            return;
+          }
+          if (targetField.type === 'checkbox') {
+            if (targetField.checked.toString() === targetFieldValue) {
+              field.style.display = 'block';
+            } else {
+              field.style.display = 'none';
+            }
+          } else if (targetField.type === 'radio') {
+            const checkedRadio = document.querySelector(`[name="${targetFieldName}"]:checked`);
+            if (checkedRadio && checkedRadio.value === targetFieldValue) {
+              field.style.display = 'block';
+            } else {
+              field.style.display = 'none';
+            }
+          } else {
+            if (targetField.value === targetFieldValue) {
+              field.style.display = 'block';
+            } else {
+              field.style.display = 'none';
+            }
+          }
+        }
+
+        // Initial check
+        updateVisibility();
+
+        // Add event listener
+        targetField.addEventListener('change', updateVisibility);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      handleShowIf();
+    });
+  </script>
+</body>
+</html>

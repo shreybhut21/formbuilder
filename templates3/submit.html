@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>{{ title }} - Submission</title>
+  <style>
+    .btn, .btn-group .btn {
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn:hover, .btn:focus {
+      transform: translateY(-2px) scale(1.04);
+      box-shadow: 0 6px 18px rgba(118,75,162,0.12);
+    }
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.7s forwards;
+    }
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+    .toast {
+      animation: slideInRight 0.5s;
+    }
+    @keyframes slideInRight {
+      from { transform: translateX(100px); opacity: 0; }
+      to   { transform: none; opacity: 1; }
+    }
+    .floating-shape {
+      position: fixed;
+      top: 10%;
+      left: 80%;
+      width: 120px;
+      height: 120px;
+      background: radial-gradient(circle, #764ba2 60%, #667eea 100%);
+      border-radius: 50%;
+      opacity: 0.15;
+      animation: floatY 6s ease-in-out infinite alternate;
+      z-index: 0;
+    }
+    @keyframes floatY {
+      from { transform: translateY(0); }
+      to   { transform: translateY(40px); }
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <style>
+    body {
+      background: linear-gradient(to bottom right, #c0b935, #e21b1b);
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .submit-card {
+      background: #e0ffff;
+      max-width: 720px;
+      margin: 40px auto;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+    th {
+      background: #ffc107;
+    }
+  </style>
+</head>
+<body>{{ navbar|safe }}
+
+  <div class="submit-card">
+    {% if error %}
+      <div class="alert alert-danger">{{ error }}</div>
+    {% else %}
+      <h1>Submission Received!</h1>
+      <p>The following data was submitted for <strong>{{ title }}</strong>:</p>
+
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            {% for key in submitted.keys() %}
+              <th>{{ key }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            {% for value in submitted.values() %}
+              <td>{{ value }}</td>
+            {% endfor %}
+          </tr>
+        </tbody>
+      </table>
+
+    {% endif %}
+    <a href="{{ url_for('firstpage') }}" class="btn btn-primary mt-3 btn-animate-pulse">Back to Form Builder</a>
+  </div>
+</body>
+</html>

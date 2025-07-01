@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+      .btn, .btn-group .btn {
+        transition: transform 0.15s, box-shadow 0.15s;
+      }
+      .btn:hover, .btn:focus {
+        transform: translateY(-2px) scale(1.04);
+        box-shadow: 0 6px 18px rgba(118,75,162,0.12);
+      }
+      .btn-animate-pulse {
+        animation: pulseBtn 1.2s infinite alternate;
+      }
+      @keyframes pulseBtn {
+        from { box-shadow: 0 0 0 0 rgba(118,75,162,0.18); }
+        to   { box-shadow: 0 0 0 8px rgba(118,75,162,0.10); }
+      }
+      .fade-in {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeInUp 0.7s forwards;
+      }
+      @keyframes fadeInUp {
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      .toast {
+        animation: slideInRight 0.5s;
+      }
+      @keyframes slideInRight {
+        from { transform: translateX(100px); opacity: 0; }
+        to   { transform: none; opacity: 1; }
+      }
+      .floating-shape {
+        position: fixed;
+        top: 10%;
+        left: 80%;
+        width: 120px;
+        height: 120px;
+        background: radial-gradient(circle, #764ba2 60%, #667eea 100%);
+        border-radius: 50%;
+        opacity: 0.15;
+        animation: floatY 6s ease-in-out infinite alternate;
+        z-index: 0;
+      }
+      @keyframes floatY {
+        from { transform: translateY(0); }
+        to   { transform: translateY(40px); }
+      }
+      .card, .responses-card, .builder-card, .form-preview-card, .main-card {
+        opacity: 0;
+        transform: translateY(30px) scale(0.98);
+        animation: fadeInCard 0.7s forwards;
+        animation-delay: 0.2s;
+      }
+      .main-card {
+        background: rgba(255, 255, 255, 0.95);
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+        padding: 2.5rem;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
+      @keyframes fadeInCard {
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+    </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>User Management - Form Builder</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+      body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        color: #333;
+      }
+      .table-custom {
+        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+      .password-change-form {
+        margin-top: 10px;
+      }
+    </style>
+</head>
+<body>{{ navbar | safe }}
+
+    <div class="container mt-5">
+        <h1 class="mb-4">User Management</h1>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }} alert-dismissible fade show fade-in" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+    <!-- Add User Form -->
+    <div class="mb-4">
+        <a href="{{ url_for('login') }}" class="btn btn-primary">Add new user</a>
+    </div>
+
+    <!-- Users Table -->
+    <table class="table table-custom table-bordered table-striped align-middle">
+        <thead class="table-light">
+            <tr>
+            <th>UID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Password</th>
+            <th>Create Date</th>
+            <th>Write Date</th>
+            <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.uid }}</td>
+                <td>{{ user.name }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.phone }}</td>
+                <td>******</td>
+                <td>{{ user.create_date }}</td>
+                <td>{{ user.write_date }}</td>
+            <td>
+            <a href="{{ url_for('register', uid=user.uid) }}" class="btn btn-sm btn-primary">Change</a>
+            <!-- Removed Change Password button and form as per request -->
+            <form action="{{ url_for('delete_user', uid=user.uid) }}" method="POST" style="display:inline;">
+                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this user?');">Delete</button>
+            </form>
+            <a href="{{ url_for('logout') }}" class="btn btn-sm btn-warning ms-1">Logout</a>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="8" class="text-center">No users found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+    <script>
+      function showCurrentPasswordForm(uid) {
+        document.getElementById('password-change-form-' + uid).style.display = 'block';
+        document.getElementById('show-pass-btn-' + uid).style.display = 'none';
+      }
+
+      function verifyCurrentPassword(uid) {
+        const currentPasswordInput = document.getElementById('current-password-' + uid);
+        const currentPassword = currentPasswordInput.value;
+        if (!currentPassword) {
+          alert('Please enter the current password.');
+          return;
+        }
+        fetch(`/verify_password/${uid}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ current_password: currentPassword }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              document.getElementById('current-password-section-' + uid).style.display = 'none';
+              document.getElementById('new-password-section-' + uid).style.display = 'block';
+            } else {
+              alert(data.message || 'Current password is incorrect.');
+            }
+          })
+          .catch((error) => {
+            alert('Error verifying password.');
+            console.error('Error:', error);
+          });
+      }
+
+      function submitNewPassword(uid) {
+        const newPasswordInput = document.getElementById('new-password-' + uid);
+        const confirmPasswordInput = document.getElementById('confirm-password-' + uid);
+        const newPassword = newPasswordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+        if (!newPassword || !confirmPassword) {
+          alert('Please enter and confirm the new password.');
+          return;
+        }
+        if (newPassword !== confirmPassword) {
+          alert('New password and confirmation do not match.');
+          return;
+        }
+        // Create a form and submit POST request to change_password endpoint
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/change_password/${uid}`;
+
+        const currentPasswordField = document.createElement('input');
+        currentPasswordField.type = 'hidden';
+        currentPasswordField.name = 'current_password';
+        currentPasswordField.value = document.getElementById('current-password-' + uid).value;
+        form.appendChild(currentPasswordField);
+
+        const newPasswordField = document.createElement('input');
+        newPasswordField.type = 'hidden';
+        newPasswordField.name = 'new_password';
+        newPasswordField.value = newPassword;
+        form.appendChild(newPasswordField);
+
+        const confirmPasswordField = document.createElement('input');
+        confirmPasswordField.type = 'hidden';
+        confirmPasswordField.name = 'confirm_password';
+        confirmPasswordField.value = confirmPassword;
+        form.appendChild(confirmPasswordField);
+
+        document.body.appendChild(form);
+        form.submit();
+      }
+
+      function cancelPasswordChange(uid) {
+        document.getElementById('password-change-form-' + uid).style.display = 'none';
+        document.getElementById('show-pass-btn-' + uid).style.display = 'inline-block';
+        document.getElementById('current-password-section-' + uid).style.display = 'block';
+        document.getElementById('new-password-section-' + uid).style.display = 'none';
+        document.getElementById('current-password-' + uid).value = '';
+        document.getElementById('new-password-' + uid).value = '';
+        document.getElementById('confirm-password-' + uid).value = '';
+      }
+    </script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

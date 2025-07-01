@@ -1,0 +1,257 @@
+h<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ title }} - Form</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: 'Poppins', sans-serif;
+      color: #333;
+      padding-top: 2rem;
+      padding-bottom: 2rem;
+    }
+    .form-container {
+      background: rgba(255, 255, 255, 0.95);
+      max-width: 750px;
+      margin: auto;
+      padding: 2.5rem;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      opacity: 0;
+      transform: translateY(30px) scale(0.98);
+      animation: fadeInCard 0.7s forwards;
+      animation-delay: 0.2s;
+    }
+    .form-control, .form-select {
+      border-radius: 8px;
+      transition: all 0.2s ease-in-out;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: #764ba2;
+      box-shadow: 0 0 0 0.25rem rgba(118, 75, 162, 0.25);
+    }
+    .required-asterisk {
+      color: #dc3545;
+      font-weight: bold;
+      margin-left: 2px;
+    }
+    .form-check-group {
+      background-color: #f8f9fa;
+      padding: 1rem;
+      border-radius: 8px;
+      border: 1px solid #dee2e6;
+    }
+    .form-footer {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 0.85rem;
+      color: #6c757d;
+    }
+    @keyframes fadeInCard {
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+  </style>
+  <style>
+    .btn, .btn-group .btn {
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn:hover, .btn:focus {
+      transform: translateY(-2px) scale(1.04);
+      box-shadow: 0 6px 18px rgba(118,75,162,0.12);
+    }
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.7s forwards;
+    }
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+    .toast {
+      animation: slideInRight 0.5s;
+    }
+    @keyframes slideInRight {
+      from { transform: translateX(100px); opacity: 0; }
+      to   { transform: none; opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="floating-shape"></div>
+  <style>
+    .floating-shape {
+      position: fixed;
+      top: 10%;
+      left: 80%;
+      width: 120px;
+      height: 120px;
+      background: radial-gradient(circle, #764ba2 60%, #667eea 100%);
+      border-radius: 50%;
+      opacity: 0.15;
+      animation: floatY 6s ease-in-out infinite alternate;
+      z-index: 0;
+    }
+    @keyframes floatY {
+      from { transform: translateY(0); }
+      to   { transform: translateY(40px); }
+    }
+  </style>
+  <div class="form-container">
+    <!-- Flash Messages -->
+    <div id="progress-bar" style="height:4px; background:#764ba2; width:0; transition:width 0.4s; position:fixed; top:0; left:0; z-index:2000;"></div>
+    <script>
+      function showProgressBar() {
+        document.getElementById('progress-bar').style.width = '100%';
+        setTimeout(() => {
+          document.getElementById('progress-bar').style.width = '0';
+        }, 1200);
+      }
+      document.querySelector('form').addEventListener('submit', showProgressBar);
+    </script>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="container mb-3">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <!-- Form Header -->
+    <h1 class="fw-bold text-center">{{ title }}</h1>
+    <p class="text-muted text-center mb-4">{{ description }}</p>
+    <hr class="my-4" />
+
+    <!-- Form Body -->
+    <form method="POST" action="{{ url_for('submit_form_v1') }}">
+      <!-- Hidden metadata -->
+      <input type="hidden" name="form_id" value="{{ form_id }}" />
+      <input type="hidden" name="form_title" value="{{ title | e }}" />
+      <input type="hidden" name="form_description" value="{{ description | e }}" />
+      <input type="hidden" name="user" value="{{ session.get('user_name', 'Anonymous') | e }}" />
+
+      {# Use a hidden textarea for form_structure to preserve JSON quotes #}
+      <textarea name="form_structure" style="display: none;">{{ form_fields | tojson | safe }}</textarea>
+
+      {% for field in form_fields %}
+      {% set field_id = field.name ~ "_" ~ loop.index0 %}
+      <div class="mb-4">
+        <label class="form-label fw-medium" for="{{ field_id }}">
+          {{ field.label }}
+          {% if field.required %}<span class="required-asterisk">*</span>{% endif %}
+        </label>
+
+        {% if field.type == 'textarea' %}
+        <textarea
+          id="{{ field_id }}"
+          name="{{ field.name }}"
+          class="form-control"
+          placeholder="{{ field.placeholder or '' }}"
+          {% if field.minlength %} minlength="{{ field.minlength }}" {% endif %}
+          {% if field.maxlength %} maxlength="{{ field.maxlength }}" {% endif %}
+          {% if field.required %} required {% endif %}
+          autocomplete="{{ field.autocomplete|default('on') }}"
+          >{{ field.value or '' }}</textarea
+        >
+
+        {% elif field.type == 'select' %}
+        <select
+          id="{{ field_id }}"
+          name="{{ field.name }}"
+          class="form-select"
+          {% if field.required %} required {% endif %}
+        >
+          <option value="" disabled {% if not field.value %}selected{% endif %}>
+            {{ field.placeholder or 'Select an option' }}
+          </option>
+          {% for option in field.options %}
+          <option value="{{ option }}" {% if field.value == option %}selected{% endif %}>
+            {{ option }}
+          </option>
+          {% endfor %}
+        </select>
+
+        {% elif field.type in ['radio', 'checkbox'] %}
+        <div class="form-check-group">
+          {% for option in field.options %}
+          {% set option_id = field_id ~ "_" ~ loop.index0 %}
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="{{ field.type }}"
+              name="{{ field.name }}"
+              id="{{ option_id }}"
+              value="{{ option }}"
+              {% if field.required %} required {% endif %}
+              {% if field.type == 'checkbox' and option in (field.value or []) %} checked {% endif %}
+              {% if field.type == 'radio' and option == field.value %} checked {% endif %}
+            />
+            <label class="form-check-label" for="{{ option_id }}">
+              {{ option }}
+            </label>
+          </div>
+          {% endfor %}
+        </div>
+
+        {% else %}
+        {# Default handler for inputs like text, email, number, password, etc. #}
+        <input
+          id="{{ field_id }}"
+          type="{{ field.type }}"
+          name="{{ field.name }}"
+          class="form-control"
+          placeholder="{{ field.placeholder or '' }}"
+          value="{{ field.value or '' }}"
+          {% if field.minlength %} minlength="{{ field.minlength }}" {% endif %}
+          {% if field.maxlength %} maxlength="{{ field.maxlength }}" {% endif %}
+          {% if field.min %} min="{{ field.min }}" {% endif %}
+          {% if field.max %} max="{{ field.max }}" {% endif %}
+          {% if field.required %} required {% endif %}
+          autocomplete="{{ field.autocomplete|default('on') }}"
+          {% if field.pattern %}pattern="{{ field.pattern }}"{% endif %}
+        />
+        {% endif %}
+
+        {% if field.description %}
+        <small class="form-text text-muted mt-1">{{ field.description }}</small>
+        {% endif %}
+      </div>
+      {% endfor %}
+
+      <hr class="my-4" />
+
+      <!-- Form Actions -->
+      <div class="d-flex justify-content-between align-items-center">
+        <a href="{{ url_for('allforms_view') }}" class="btn btn-secondary">← Back to All Forms</a>
+        <button type="submit" class="btn btn-primary btn-lg px-5 btn-animate-pulse">Submit</button>
+      </div>
+    </form>
+
+    <div class="form-footer">
+      <!-- Additional footer notes if required -->
+    </div>
+  </div>
+</body>
+</html>

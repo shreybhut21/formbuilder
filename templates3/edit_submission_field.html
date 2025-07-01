@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Edit Submission - {{ form_title }}</title>
+  <style>
+    .btn, .btn-group .btn {
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn:hover, .btn:focus {
+      transform: translateY(-2px) scale(1.04);
+      box-shadow: 0 6px 18px rgba(118,75,162,0.12);
+    }
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.7s forwards;
+    }
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+    .toast {
+      animation: slideInRight 0.5s;
+    }
+    @keyframes slideInRight {
+      from { transform: translateX(100px); opacity: 0; }
+      to   { transform: none; opacity: 1; }
+    }
+    .floating-shape {
+      position: fixed;
+      top: 10%;
+      left: 80%;
+      width: 120px;
+      height: 120px;
+      background: radial-gradient(circle, #764ba2 60%, #667eea 100%);
+      border-radius: 50%;
+      opacity: 0.15;
+      animation: floatY 6s ease-in-out infinite alternate;
+      z-index: 0;
+    }
+    @keyframes floatY {
+      from { transform: translateY(0); }
+      to   { transform: translateY(40px); }
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+  {{ navbar|safe }}
+  <div class="container mt-5">
+    <h1 class="mb-4">Edit Submission (ID: {{ form_id }})</h1>
+    <form method="POST">
+      {% for field in allowed_fields %}
+        <div class="mb-3">
+          <label class="form-label">{{ field|capitalize }}</label>
+          {# Decide the input type based on field name #}
+          {% set input_type = "text" %}
+          {% if field == "email" %}
+            {% set input_type = "email" %}
+          {% elif field == "password" %}
+            {% set input_type = "password" %}
+          {% elif field == "url" %}
+            {% set input_type = "url" %}
+          {% elif field == "range" %}
+            {% set input_type = "range" %}
+          {% elif field == "checkbox" %}
+            {% set input_type = "checkbox" %}
+          {% elif field == "radio" %}
+            {% set input_type = "radio" %}
+          {% endif %}
+
+          {# Render a different markup if the field is a checkbox #}
+          {% if input_type == "checkbox" %}
+            <div class="form-check">
+              <input type="checkbox" name="{{ field }}" class="form-check-input"
+                     {% if submission_dict[field] and submission_dict[field] != "0" %}checked{% endif %}>
+              <label class="form-check-label">{{ field|capitalize }}</label>
+            </div>
+          {% elif input_type == "radio" %}
+            {# For radio buttons, we would ideally have a list of options. 
+               Without that info, we'll fall back to a text input or you can hardcode options. #}
+            <input type="radio" name="{{ field }}" class="form-control" value="{{ submission_dict[field] }}">
+          {% else %}
+            <input type="{{ input_type }}" name="{{ field }}" class="form-control" value="{{ submission_dict[field] }}">
+          {% endif %}
+        </div>
+      {% endfor %}
+      <button type="submit" class="btn btn-primary">Save</button>
+      <a href="{{ url_for('view_form', form_id=form_id) }}" class="btn btn-secondary">Cancel</a>
+    </form>
+  </div>
+</body>
+</html>

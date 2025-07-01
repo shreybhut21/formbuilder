@@ -1,0 +1,299 @@
+<!-- File: edit_layout.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    .btn, .btn-group .btn {
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn:hover, .btn:focus {
+      transform: translateY(-2px) scale(1.04);
+      box-shadow: 0 6px 18px rgba(118,75,162,0.12);
+    }
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.7s forwards;
+    }
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+    .toast {
+      animation: slideInRight 0.5s;
+    }
+    @keyframes slideInRight {
+      from { transform: translateX(100px); opacity: 0; }
+      to   { transform: none; opacity: 1; }
+    }
+    .floating-shape {
+      position: fixed;
+      top: 10%;
+      left: 80%;
+      width: 120px;
+      height: 120px;
+      background: radial-gradient(circle, #764ba2 60%, #667eea 100%);
+      border-radius: 50%;
+      opacity: 0.15;
+      animation: floatY 6s ease-in-out infinite alternate;
+      z-index: 0;
+    }
+    @keyframes floatY {
+      from { transform: translateY(0); }
+      to   { transform: translateY(40px); }
+    }
+  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Layout - {{ title }}</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: 'Poppins', sans-serif;
+      color: #333;
+      min-height: 100vh;
+    }
+    .builder-card {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      margin-top: 2rem;
+      margin-bottom: 2rem;
+    }
+    .field-list-item {
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      padding: 10px 15px;
+      margin-bottom: 10px;
+    }
+    .field-attribute {
+      display: none;
+    }
+    hr {
+      opacity: 0.25;
+    }
+  </style>
+</head>
+<body>
+{{ navbar | safe }}
+  <div class="container-fluid py-4">
+    <!-- Main layout form for Save/Update actions -->
+    <form method="POST" id="main-layout-form">
+      <input type="hidden" name="form_id" value="{{ form_id }}">
+      <div class="row gx-4">
+        <!-- Left Column: Field Editor -->
+        <div class="col-lg-5">
+          <div class="builder-card">
+            <h3 class="mb-4 fw-bold">  
+              {% if editing_field %}
+                <i class="bi bi-pencil-square me-2"></i>Edit Field
+              {% else %}
+                <i class="bi bi-plus-circle-dotted me-2"></i>Add a New Field
+              {% endif %}
+            </h3>
+
+            {% if editing_field %}
+              <input type="hidden" name="edit_index" value="{{ edit_index }}">
+            {% endif %}
+
+            <!-- Core Fields -->
+            <div class="mb-3">
+              <label class="form-label fw-medium">Label</label>
+              <input name="label" class="form-control" required value="{{ editing_field.label if editing_field else '' }}">
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-medium">Field Name</label>
+              <input name="name" class="form-control" required value="{{ editing_field.name if editing_field else '' }}">
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-medium">Type</label>
+              <select name="type" class="form-select" onchange="toggleFieldAttributes()" required>
+                {% set types = ['text','email','password','number','date','time','textarea','select','radio','checkbox','range','color','file','url','tel','search','datetime-local','month','week'] %}
+                {% for t in types %}
+                  <option value="{{ t }}" {% if editing_field and editing_field.type == t %}selected{% endif %}>
+                    {{ t.replace('-', ' ').capitalize() }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+            <hr class="my-4">
+
+            <!-- Contextual Attributes -->
+            <div id="options-wrapper" class="field-attribute mb-3">
+              <label class="form-label fw-medium">Options (comma-separated)</label>
+              <input name="options" class="form-control" value="{{ editing_field.options | join(', ') if editing_field and editing_field.options else '' }}">
+            </div>
+
+            <div id="text-validation-wrapper" class="field-attribute">
+              <div class="row">
+                <div class="col-6 mb-3">
+                  <label class="form-label fw-medium">Min Length</label>
+                  <input name="minlength" type="number" class="form-control" value="{{ editing_field.minlength if editing_field else '' }}">
+                </div>
+                <div class="col-6 mb-3">
+                  <label class="form-label fw-medium">Max Length</label>
+                  <input name="maxlength" type="number" class="form-control" value="{{ editing_field.maxlength if editing_field else '' }}">
+                </div>
+              </div>
+            </div>
+
+            <div id="number-validation-wrapper" class="field-attribute">
+              <div class="row">
+                <div class="col-6 mb-3">
+                  <label class="form-label fw-medium">Min Value</label>
+                  <input name="min" type="number" class="form-control" value="{{ editing_field.min if editing_field else '' }}">
+                </div>
+                <div class="col-6 mb-3">
+                  <label class="form-label fw-medium">Max Value</label>
+                  <input name="max" type="number" class="form-control" value="{{ editing_field.max if editing_field else '' }}">
+                </div>
+              </div>
+            </div>
+
+            <div id="placeholder-wrapper" class="field-attribute mb-3">
+              <label class="form-label fw-medium">Placeholder</label>
+              <input name="placeholder" class="form-control" value="{{ editing_field.placeholder if editing_field else '' }}">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-medium">Default Value</label>
+              <input name="value" class="form-control" value="{{ editing_field.value if editing_field else '' }}">
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-medium">Help Text / Description</label>
+              <input name="description" class="form-control" value="{{ editing_field.description if editing_field else '' }}">
+            </div>
+            <div class="form-check mb-4">
+              <input type="checkbox" name="required" class="form-check-input" id="required" {% if editing_field and editing_field.required %}checked{% endif %}>
+              <label class="form-check-label" for="required">Required Field</label>
+            </div>
+
+            <!-- Actions for the Field Editor Panel -->
+            <div class="d-flex justify-content-end">
+              {% if editing_field %}
+                <a href="{{ url_for('edit_layout', form_id=form_id) }}" class="btn btn-secondary me-2">Cancel Edit</a>
+              {% endif %}
+              <button type="submit" class="btn btn-primary" formaction="{{ url_for('edit_layout', form_id=form_id) }}">
+                {{ 'Update Field' if editing_field else 'Add Field' }} <i class="bi bi-arrow-right-circle ms-1"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Form Overview & Save -->
+        <div class="col-lg-7">
+          <div class="builder-card h-100">
+            <h3 class="mb-4 fw-bold"><i class="bi bi-card-list me-2"></i>Form Layout</h3>
+
+            <div class="mb-3">
+              <label class="form-label fw-medium">Form Title</label>
+              <input type="text" name="form_title" class="form-control" value="{{ title or '' }}" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-medium">Form Description</label>
+              <textarea name="form_description" class="form-control">{{ form_description or '' }}</textarea>
+            </div>
+
+            <hr class="my-4">
+            <h5 class="mb-3 fw-bold">Existing Fields ({{ form_fields|length }})</h5>
+            
+            {# Uncomment the next block for debugging the JSON structure if needed #}
+            {#
+            <pre>{{ form_fields | tojson(indent=2) }}</pre>
+            #}
+            
+            <div class="list-group list-group-flush">
+              {% if form_fields %}
+                {% for f in form_fields %}
+                  <div class="d-flex justify-content-between align-items-center field-list-item">
+                    <div>
+                      <span class="fw-medium">{{ f.label or '(No Label)' }}</span>
+                      <small class="text-muted">({{ f.name or '(No Name)' }})</small>
+                      <span class="badge bg-secondary fw-normal ms-2">{{ f.type }}</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                      <a href="{{ url_for('edit_layout', form_id=form_id, edit=loop.index0) }}" class="btn btn-sm btn-outline-primary me-2" title="Edit">
+                        <i class="bi bi-pencil-square"></i>
+                      </a>
+                      <!-- Delete button is now in its own mini-form to bypass validation -->
+<form method="POST" action="{{ url_for('edit_layout', form_id=form_id) }}" style="display:inline;">
+  <input type="hidden" name="submit_action" value="delete_field">
+  <input type="hidden" name="edit_index" value="{{ loop.index0 }}">
+  <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete" formnovalidate>
+    <i class="bi bi-trash"></i>
+  </button>
+</form>
+                    </div>
+                  </div>
+                {% endfor %}
+              {% else %}
+                <p class="text-center text-muted p-4 bg-light rounded-3">
+                  This form has no fields yet. Add one from the left panel.
+                </p>
+              {% endif %}
+            </div>
+
+            <div class="d-flex justify-content-between mt-4 pt-4 border-top">
+              <a href="{{ url_for('allforms_view') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-x-circle me-1"></i> Discard All Changes
+              </a>
+              <button type="submit" name="submit_action" value="save_all" formaction="{{ url_for('view_layout', form_id=form_id) }}" class="btn btn-lg btn-success" formnovalidate>
+  <i class="bi bi-check-circle me-1"></i> Save All Changes to Layout
+</button>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    function toggleFieldAttributes() {
+      const type = document.querySelector('select[name="type"]').value;
+      const config = {
+        text: ['text-validation-wrapper', 'placeholder-wrapper'],
+        textarea: ['text-validation-wrapper', 'placeholder-wrapper'],
+        password: ['text-validation-wrapper', 'placeholder-wrapper'],
+        email: ['placeholder-wrapper'],
+        url: ['placeholder-wrapper'],
+        tel: ['placeholder-wrapper'],
+        search: ['placeholder-wrapper'],
+        number: ['number-validation-wrapper', 'placeholder-wrapper'],
+        range: ['number-validation-wrapper'],
+        date: ['number-validation-wrapper'],
+        'datetime-local': ['number-validation-wrapper'],
+        month: ['number-validation-wrapper'],
+        week: ['number-validation-wrapper'],
+        time: ['number-validation-wrapper'],
+        select: ['options-wrapper'],
+        radio: ['options-wrapper'],
+        checkbox: ['options-wrapper']
+      };
+      document.querySelectorAll('.field-attribute').forEach(function(el) {
+        el.style.display = 'none';
+      });
+      (config[type] || []).forEach(function(id) {
+        const el = document.getElementById(id);
+        if (el) {
+          el.style.display = 'block';
+        }
+      });
+    }
+    document.addEventListener('DOMContentLoaded', toggleFieldAttributes);
+  </script>
+</body>
+</html>
