@@ -46,7 +46,7 @@ def reset():
     for key in ("form_fields", "form_title", "form_description", "user_name", "editing_form_id"):
         session.pop(key, None)
     return redirect(url_for("firstpage"))
-        
+
 def init_db():
     """Create the submissions and user tables (if not exists)."""
     with sqlite3.connect(DB_FILE) as conn:
@@ -303,46 +303,34 @@ def create_form():
 @app.context_processor
 def inject_navbar():
     username = session.get("username", "Guest")
-    first_letter = username[0].upper() if username else "G"
     navbar = f'''
-    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
-      <div class="container d-flex align-items-center justify-content-between">
-        <div class="d-flex align-items-center">
-          <div style="width: 40px; height: 40px; background-color: #6a5acd; color: white; font-weight: bold; font-size: 1.5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 10px;">
-            {first_letter}
-          </div>
-          <span class="me-3">Welcome, {username}</span>
-        </div>
-        <div>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm" style="position:sticky;top:0;z-index:100;">
+      <div class="container-fluid">
+        <a class="navbar-brand fw-bold text-primary" href="{url_for('home')}">
+          <img src="{url_for('static', filename='logo.png')}" alt="Logo" style="height:36px;vertical-align:middle;margin-right:8px;">
+          Form Builder Pro
+        </a>
+        <div class="d-flex align-items-center ms-auto">
           <a href="{url_for('reset')}" class="btn btn-warning me-2">Form Builder</a>
           <a href="{url_for('home')}" class="btn btn-warning me-2">Home</a>
           <a href="{url_for('allforms_view')}" class="btn btn-warning me-2">View All Forms</a>
           <a href="{url_for('viewuser')}" class="btn btn-warning me-2">View Users</a>
-          
+          {'<div class="dropdown ms-3">' if session.get('logged_in') else ''}
+          {'<button class="btn btn-light rounded-circle d-flex align-items-center profile-icon" type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="box-shadow:0 2px 8px rgba(0,0,0,0.08);">' if session.get('logged_in') else ''}
+          {f'<span class="me-2 fw-semibold text-primary">{username[0].upper()}</span>' if session.get('logged_in') else ''}
+          {'</button>' if session.get('logged_in') else ''}
+          {'<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">' if session.get('logged_in') else ''}
+          {f'<li><span class="dropdown-item-text">Hi, {username}</span></li>' if session.get('logged_in') else ''}
+          {'<li><a class="dropdown-item" href="' + url_for('viewuser') + '">Profile</a></li>' if session.get('logged_in') else ''}
+          {'<li><hr class="dropdown-divider"></li>' if session.get('logged_in') else ''}
+          {'<li><a class="dropdown-item" href="' + url_for('logout') + '">Sign out</a></li>' if session.get('logged_in') else ''}
+          {'</ul>' if session.get('logged_in') else ''}
+          {'</div>' if session.get('logged_in') else ''}
+          {f'<a href="{url_for("login")}" class="btn btn-light rounded-pill px-4 fw-semibold ms-3" style="box-shadow:0 2px 8px rgba(0,0,0,0.08);"><i class="bi bi-person-circle me-2"></i>Login</a>' if not session.get('logged_in') else ''}
         </div>
       </div>
     </nav>
-    <script>
-      function setDarkMode(enabled) {{
-        if (enabled) {{
-          document.body.classList.add('dark-mode');
-          localStorage.setItem('darkMode', '1');
-          document.getElementById('darkModeIcon').className = 'bi bi-brightness-high';
-        }} else {{
-          document.body.classList.remove('dark-mode');
-          localStorage.setItem('darkMode', '0');
-          document.getElementById('darkModeIcon').className = 'bi bi-moon';
-        }}
-      }}
-      document.addEventListener('DOMContentLoaded', function() {{
-        var darkMode = localStorage.getItem('darkMode') === '1';
-        setDarkMode(darkMode);
-        document.getElementById('darkModeToggle').onclick = function() {{
-          darkMode = !darkMode;
-          setDarkMode(darkMode);
-        }};
-      }});
-    </script>
+       
     <style>
       .dark-mode {{
         background-color: #181a1b !important;
@@ -454,10 +442,12 @@ def logout():
 def root_redirect():
     return redirect(url_for("home"))
 
+from datetime import datetime
+
 @app.route("/home", methods=["GET"])
 def home():
-    return render_template("home.html")
-
+    return render_template("home.html", now=datetime.now)
+    
 # Predefined templates with fields
 TEMPLATES = {
     "school_admission": {
@@ -676,6 +666,7 @@ def firstpage():
 
         # Read edit_index from form data on POST
         edit_index = request.form.get("edit_index")
+        submit_action = request.form.get("submit_action")
 
         new_field = {
             "label": request.form.get("label", ""),
@@ -703,7 +694,18 @@ def firstpage():
         duplicate_label = any(f["label"] == new_field["label"] for f in form_fields)
         duplicate_name = any(f["name"] == new_field["name"] for f in form_fields)
 
-        if duplicate_label or duplicate_name:
+        if submit_action == "delete_field" and edit_index is not None and edit_index.isdigit():
+            idx = int(edit_index)
+            print(f"DEBUG: Attempting to delete field at index {idx} from form_fields with length {len(form_fields)}")
+            if 0 <= idx < len(form_fields):
+                form_fields.pop(idx)
+                session["form_fields"] = form_fields
+                print(f"DEBUG: Field deleted successfully. Updated form_fields length: {len(form_fields)}")
+                flash("Field deleted successfully.", "success")
+            else:
+                print(f"DEBUG: Invalid field index for deletion: {idx}")
+                flash("Invalid field index for deletion.", "danger")
+        elif duplicate_label or duplicate_name:
             flash("Duplicate label or field name is not allowed.", "danger")
         else:
             if edit_index is not None and edit_index.isdigit():
@@ -777,7 +779,27 @@ def formmaker_page():
         # For shared link, load form fields from DB but do not use session data
         # So do nothing here, keep form_fields loaded from DB
         # Optionally, disable editing features in template using shared flag
-        pass
+        # Also, disable navbar to prevent navigation
+        navbar = ""
+    else:
+        navbar = '''
+        <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+          <div class="container d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+              <div style="width: 40px; height: 40px; background-color: #6a5acd; color: white; font-weight: bold; font-size: 1.5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 10px;">
+                {{ session.get('username', 'G')[0].upper() }}
+              </div>
+              <span class="me-3">Welcome, {{ session.get('username', 'Guest') }}</span>
+            </div>
+            <div>
+              <a href="{{ url_for('reset') }}" class="btn btn-warning me-2">Form Builder</a>
+              <a href="{{ url_for('home') }}" class="btn btn-warning me-2">Home</a>
+              <a href="{{ url_for('allforms_view') }}" class="btn btn-warning me-2">View All Forms</a>
+              <a href="{{ url_for('viewuser') }}" class="btn btn-warning me-2">View Users</a>
+            </div>
+          </div>
+        </nav>
+        '''
     
     return render_template("formmaker.html",
                            title=title,
@@ -785,7 +807,17 @@ def formmaker_page():
                            form_fields=form_fields,
                            form_id=form_id,
                            shared=shared,
-                           navbar="<!-- Navbar placeholder -->")
+                           navbar=navbar)
+
+@app.route('/delete_session_field/<int:index>', methods=['POST'])
+def delete_session_field(index):
+    form_fields = session.get('form_fields', [])
+    if 0 <= index < len(form_fields):
+        form_fields.pop(index)
+        session['form_fields'] = form_fields
+        return jsonify({'status': 'success'})
+    else:
+        return jsonify({'status': 'error', 'message': 'Invalid field index'})
             
 
 # -----------------------------------------------------------------------------

@@ -25,6 +25,36 @@
       background: rgba(255, 255, 255, 0.95);
       max-width: 800px;
       margin: auto;
+<create_file>
+<path>templates3/view_form.html</path>
+<content>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>View Submission - {{ form_title }}</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: 'Poppins', sans-serif;
+      color: #333;
+      min-height: 100vh;
+      padding-top: 2rem;
+      padding-bottom: 2rem;
+    }
+    .details-card {
+      background: rgba(255, 255, 255, 0.95);
+      max-width: 800px;
+      margin: auto;
       padding: 2.5rem;
       border-radius: 15px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
@@ -90,9 +120,6 @@
       
       <!-- Card Footer with Actions -->
       <div class="pt-4 mt-4 border-top d-flex justify-content-between align-items-center">
-        <a href="{{ url_for('allforms_view') }}" class="btn btn-secondary">
-          <i class="bi bi-arrow-left me-1"></i> Back to All Forms
-        </a>
         <div class="actions">
           {% if latest_response_id %}
           <a href="{{ url_for('edit_submission', form_id=form_id, response_id=latest_response_id) }}" class="btn btn-warning me-2">
@@ -118,4 +145,3 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-

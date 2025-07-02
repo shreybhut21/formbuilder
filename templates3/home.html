@@ -12,6 +12,7 @@
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       position: relative;
       overflow-x: hidden;
+      padding-top: 0; /* So content doesn't hide under navbar */
     }
     /* Animated floating circles */
     .bg-circle {
@@ -68,10 +69,18 @@
       text-align: center;
       margin-bottom: 0.5rem;
     }
+    @keyframes bounce {
+      to { transform: translateY(-12px);}
+    }
+    .profile-icon:hover {
+      background-color: #e0e0e0;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
   </style>
 </head>
 <body>
-  <!-- Animated background circles -->
+  <!-- Animated background circles FIRST -->
   <div class="bg-circle bg-circle1"></div>
   <div class="bg-circle bg-circle2"></div>
   <div class="bg-circle bg-circle3"></div>
@@ -79,11 +88,47 @@
   <div class="bg-circle bg-circle5"></div>
   <div class="bg-circle bg-circle6"></div>
 
-  <div class="container py-5 position-relative" style="z-index:2;">
-    <!-- Logo at the top -->
-    <div class="text-start mb-4" style="margin-left: -82px;">
-      <img src="{{ url_for('static', filename='logo.png') }}" alt="Form Builder Pro Logo" style="height: 150px; width:auto;">
+  <!-- Navbar NEXT -->
+  <nav class="navbar navbar-expand-lg" style="
+    position:static;
+    top:0;
+    z-index:100;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+  ">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold text-white" href="{{ url_for('home') }}">
+        <img src="{{ url_for('static', filename='logo3.png') }}" alt="Logo" style="height:36px;vertical-align:middle;margin-right:8px;">
+        Form Builder Pro
+      </a>
+      <div class="d-flex align-items-center ms-auto">
+        {% if session.get('logged_in') %}
+          <div class="dropdown ms-3">
+            <button class="btn btn-light rounded-circle d-flex align-items-center profile-icon" type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+              <span class="me-2 fw-semibold text-primary">{{ session.get('username', 'User')[0]|upper }}</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+              <li><span class="dropdown-item-text">Hi, {{ session.get('username', 'User') }}</span></li>
+              <li><a class="dropdown-item" href="{{ url_for('viewuser') }}">Profile</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="{{ url_for('logout') }}">Sign out</a></li>
+            </ul>
+          </div>
+        {% else %}
+          <a href="{{ url_for('login') }}" class="btn btn-light rounded-pill px-4 fw-semibold ms-3" style="box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+            <i class="bi bi-person-circle me-2"></i>Login
+          </a>
+        {% endif %}
+      </div>
     </div>
+  </nav>
+
+  <div class="container py-5 position-relative" style="z-index:2;">
+    {% if session.get('logged_in') %}
+      <h2 class="text-white mb-4">Welcome back, {{ session.get('username', 'User') }}!</h2>
+    {% endif %}
+
     <h1 class="mb-4 text-white fw-bold">Welcome to Form Builder Pro</h1>
     <p class="lead text-white-50 mb-5">
       Form Builder Pro is a powerful and user-friendly web application that lets anyone create, share, and manage custom online forms—no coding required. Easily build forms with drag-and-drop, set field logic, collect responses, analyze results with charts, and export data. Perfect for surveys, registrations, feedback, and more.
@@ -158,44 +203,99 @@
           <h5 class="fw-semibold text-center">Create Your Own</h5>
           <p class="text-muted text-center mb-2">Start from scratch and build a fully custom form for any purpose.</p>
           <div class="d-flex justify-content-center">
-            <a href="{{ url_for('load_template', template_name='create_your_own') }}" class="btn btn-dark btn-sm">Create Form</a>
+            <a href="{{ url_for('firstpage') }}" class="btn btn-dark btn-sm">Create Form</a>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-light bg-transparent px-3" style="position: absolute; top: 0; right: 0; width: 100%; z-index: 10;">
-    <div class="container-fluid justify-content-end">
-      {% if session.get('logged_in') %}
-        <div class="dropdown">
-          <button class="btn btn-light rounded-circle d-flex align-items-center" type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="box-shadow:0 2px 8px rgba(0,0,0,0.08);">
-            <span class="me-2 fw-semibold text-primary">{{ session.get('username', 'User')[0]|upper }}</span>
-          </button>
-          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-            <li><span class="dropdown-item-text">Hi, {{ session.get('username', 'User') }}</span></li>
-            <li><a class="dropdown-item" href="{{ url_for('viewuser') }}">Profile</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="{{ url_for('logout') }}">Sign out</a></li>
-          </ul>
+    <!-- Features Section -->
+    <div class="row text-center mb-5 mt-5">
+      <div class="col-6 col-md-3 mb-3">
+        <i class="bi bi-bar-chart-line fs-2 text-warning"></i>
+        <div class="fw-semibold text-white">Analytics</div>
+        <div class="text-white-50 small">See instant charts & stats</div>
+      </div>
+      <div class="col-6 col-md-3 mb-3">
+        <i class="bi bi-share fs-2 text-info"></i>
+        <div class="fw-semibold text-white">Easy Sharing</div>
+        <div class="text-white-50 small">Share forms with a link</div>
+      </div>
+      <div class="col-6 col-md-3 mb-3">
+        <i class="bi bi-lock fs-2 text-danger"></i>
+        <div class="fw-semibold text-white">Privacy</div>
+        <div class="text-white-50 small">Control who can access</div>
+      </div>
+      <div class="col-6 col-md-3 mb-3">
+        <i class="bi bi-palette fs-2 text-success"></i>
+        <div class="fw-semibold text-white">Customizable</div>
+        <div class="text-white-50 small">Personalize your forms</div>
+      </div>
+    </div>
+
+    <!-- Your Recent Forms Section -->
+    <h3 class="mb-3 text-white mt-5">Your Recent Forms</h3>
+    <div class="row g-3 mb-5">
+      {% for form in recent_forms %}
+        <div class="col-12 col-md-6 col-lg-4">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h6 class="card-title mb-1">{{ form.title }}</h6>
+              <p class="card-text text-muted mb-2" style="font-size: 0.95em;">Last edited: {{ form.last_edited }}</p>
+              <a href="{{ url_for('view_form', form_id=form.id) }}" class="btn btn-outline-primary btn-sm">Open</a>
+            </div>
+          </div>
         </div>
       {% else %}
-        <a href="{{ url_for('login') }}" class="btn btn-light rounded-pill px-4 fw-semibold" style="box-shadow:0 2px 8px rgba(0,0,0,0.08);">
-          <i class="bi bi-person-circle me-2"></i>Login
-        </a>
-      {% endif %}
+        <div class="col-12 text-white-50">No recent forms yet.</div>
+      {% endfor %}
     </div>
-  </nav>
+  </div>
 
+  <!-- Floating Action Button -->
+  <a href="{{ url_for('firstpage') }}" class="btn btn-lg btn-primary rounded-circle shadow position-fixed"
+     style="bottom: 40px; right: 40px; z-index: 20; width:64px; height:64px; display:flex; align-items:center; 
+     justify-content:center; font-size:2rem; animation:bounce 1.2s infinite alternate;">
+    <i class="bi bi-plus"></i>
+  </a>
+
+  <!-- Footer -->
+  <footer class="text-center text-white-50 py-4 mt-5" style="background:rgba(0,0,0,0.08);">
+    &copy; {{ now().year }} Form Builder Pro &middot;
+    <a href="#" class="text-white-50 text-decoration-underline">About</a> &middot;
+    <a href="#" class="text-white-50 text-decoration-underline">Contact</a>
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
+      // Card animation
       document.querySelectorAll('.template-card').forEach(function(card, i) {
         card.style.animationDelay = (0.1 + i * 0.12) + 's';
         card.classList.add('fade-in');
       });
+
+      // Profile dropdown open on hover
+      var profileBtn = document.getElementById('profileDropdown');
+      if (profileBtn) {
+        var dropdown = new bootstrap.Dropdown(profileBtn);
+        profileBtn.addEventListener('mouseenter', function() {
+          dropdown.show();
+        });
+        profileBtn.addEventListener('mouseleave', function() {
+          setTimeout(function() {
+            if (!profileBtn.matches(':hover') && !document.querySelector('.dropdown-menu:hover')) {
+              dropdown.hide();
+            }
+          }, 200);
+        });
+        var menu = document.querySelector('.dropdown-menu');
+        if (menu) {
+          menu.addEventListener('mouseleave', function() {
+            dropdown.hide();
+          });
+        }
+      }
     });
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
