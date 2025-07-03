@@ -58,7 +58,8 @@ def init_db():
                 form_title TEXT,
                 submitted_at TEXT,
                 form_description TEXT,
-                form_structure TEXT
+                form_structure TEXT,
+                logo_data TEXT
             )
         """)
         c.execute("""
@@ -206,7 +207,7 @@ def ensure_db_initialized():
                     c = conn.cursor()
                     c.execute("PRAGMA table_info(submissions)")
                     existing = {row["name"] for row in c.fetchall()}
-                    for col in ["user", "form_title", "submitted_at", "form_description", "form_structure"]:
+                    for col in ["user", "form_title", "submitted_at", "form_description", "form_structure", "logo_data"]:
                         if col not in existing:
                             c.execute(f"ALTER TABLE submissions ADD COLUMN {col} TEXT")
                     c.execute("PRAGMA table_info(user)")
@@ -259,7 +260,8 @@ def create_form():
     form_description = request.form.get("form_description", "").strip()
     user = request.form.get("user_name", "Anonymous")
     access = request.form.get("access", "private")
-    
+    logo_data = request.form.get("logo_data", "")
+
     # Keep only debug flash message for create_form received form_title
     flash(f"Debug: create_form received form_title = {form_title}", "info")
 
@@ -279,7 +281,8 @@ def create_form():
         "form_description": form_description,
         "form_structure": structure_json,
         "submitted_at": submitted_at,
-        "access": access
+        "access": access,
+        "logo_data": logo_data
     }
 
     cols = ",".join(store.keys())
@@ -446,8 +449,42 @@ from datetime import datetime
 
 @app.route("/home", methods=["GET"])
 def home():
-    return render_template("home.html", now=datetime.now)
-    
+    user_id = session.get("user_id")
+    recent_forms = []
+    with get_db() as conn:
+        c = conn.cursor()
+        if user_id:
+            c.execute("SELECT id, form_title, submitted_at FROM submissions WHERE user = (SELECT name FROM user WHERE uid=?) ORDER BY submitted_at DESC LIMIT 3", (user_id,))
+        else:
+            c.execute("SELECT id, form_title, submitted_at FROM submissions WHERE access='public' ORDER BY submitted_at DESC LIMIT 3")
+        rows = c.fetchall()
+        for row in rows:
+            recent_forms.append({
+                "id": row["id"],
+                "title": row["form_title"],
+                "last_edited": row["submitted_at"]
+            })
+    return render_template("home.html", now=datetime.now, recent_forms=recent_forms)
+            
+@app.route("/edit_form/<int:form_id>")
+def edit_form(form_id):
+    with get_db() as conn:
+        c = conn.cursor()
+        c.execute("SELECT form_structure, form_title, form_description, logo_data FROM submissions WHERE id=?", (form_id,))
+        row = c.fetchone()
+        if not row:
+            flash("Form not found.", "danger")
+            return redirect(url_for("home"))
+        try:
+            form_fields = json.loads(row["form_structure"])
+        except Exception:
+            form_fields = []
+        session["form_fields"] = form_fields
+        session["form_title"] = row["form_title"]
+        session["form_description"] = row["form_description"]
+        session["logo_data"] = row["logo_data"]
+    return redirect(url_for("firstpage"))
+                
 # Predefined templates with fields
 TEMPLATES = {
     "school_admission": {

@@ -126,6 +126,20 @@
       }
       document.querySelector('form').addEventListener('submit', showProgressBar);
     </script>
+
+    <!-- Logo display added above form title -->
+    <div class="mb-3 d-flex flex-column align-items-start">
+      {% if logo_data %}
+        <img src="{{ logo_data }}" alt="Form Logo" class="rounded-circle mb-2" style="width:64px; height:64px; object-fit:cover;" />
+      {% else %}
+        <span class="text-muted mb-2" style="width: 64px; height: 64px; display: inline-flex; align-items: center; justify-content: center; border: 2px dashed #6a5acd; border-radius: 50%; font-size: 2rem; color: #6a5acd;">
+          <i class="bi bi-image"></i>
+        </span>
+      {% endif %}
+      <small class="text-black-50">Form logo</small>
+    </div>
+    
+
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         <div class="container mb-3">
@@ -241,7 +255,9 @@
       {% endfor %}
 
       <hr class="my-4" />
-
+<a href="{{ url_for('allforms_view') }}" class="btn btn-secondary mb-3">
+      <i class="bi bi-arrow-left me-1"></i> Back to All Forms
+    </a>
       <!-- Form Actions -->
       <div class="d-flex justify-content-between align-items-center">
         <button type="submit" class="btn btn-primary btn-lg px-5 btn-animate-pulse">Submit</button>
@@ -252,5 +268,39 @@
       <!-- Additional footer notes if required -->
     </div>
   </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const logoButton = document.getElementById('logo-button');
+      const logoInput = document.getElementById('logo-input');
+      const logoIcon = document.getElementById('logo-icon');
+
+      logoButton.addEventListener('click', function() {
+        logoInput.click();
+      });
+
+      logoInput.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file && file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            // Remove icon and show image preview
+            logoButton.innerHTML = '';
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.objectFit = 'cover';
+            logoButton.appendChild(img);
+          };
+          reader.readAsDataURL(file);
+        } else {
+          // If not an image, reset to icon
+          logoButton.innerHTML = '';
+          logoButton.appendChild(logoIcon);
+        }
+      });
+    });
+  </script>
 </body>
 </html>

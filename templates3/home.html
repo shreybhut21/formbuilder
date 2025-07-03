@@ -10,11 +10,8 @@
     body {
       min-height: 100vh;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      position: relative;
       overflow-x: hidden;
-      padding-top: 0; /* So content doesn't hide under navbar */
     }
-    /* Animated floating circles */
     .bg-circle {
       position: absolute;
       border-radius: 50%;
@@ -22,12 +19,12 @@
       animation: floatY 6s ease-in-out infinite alternate;
       z-index: 0;
     }
-    .bg-circle1 { width: 180px; height: 180px; left: 5%; top: 10%; background: #fffbe6; animation-delay: 0s;}
-    .bg-circle2 { width: 120px; height: 120px; right: 10%; top: 20%; background: #ffd6e0; animation-delay: 1s;}
-    .bg-circle3 { width: 90px; height: 90px; left: 20%; bottom: 10%; background: #e0f7fa; animation-delay: 2s;}
-    .bg-circle4 { width: 140px; height: 140px; right: 15%; bottom: 15%; background: #e1bee7; animation-delay: 3s;}
-    .bg-circle5 { width: 70px; height: 70px; left: 50%; top: 60%; background: #ffe0b2; animation-delay: 4s;}
-    .bg-circle6 { width: 60px; height: 60px; right: 40%; bottom: 5%; background: #b2dfdb; animation-delay: 5s;}
+    .bg-circle1 { width: 180px; height: 180px; left: 5%; top: 10%; background: #fffbe6; animation-delay: 0s; }
+    .bg-circle2 { width: 120px; height: 120px; right: 10%; top: 20%; background: #ffd6e0; animation-delay: 1s; }
+    .bg-circle3 { width: 90px; height: 90px; left: 20%; bottom: 10%; background: #e0f7fa; animation-delay: 2s; }
+    .bg-circle4 { width: 140px; height: 140px; right: 15%; bottom: 15%; background: #e1bee7; animation-delay: 3s; }
+    .bg-circle5 { width: 70px; height: 70px; left: 50%; top: 60%; background: #ffe0b2; animation-delay: 4s; }
+    .bg-circle6 { width: 60px; height: 60px; right: 40%; bottom: 5%; background: #b2dfdb; animation-delay: 5s; }
     @keyframes floatY {
       from { transform: translateY(0); }
       to   { transform: translateY(40px); }
@@ -47,13 +44,34 @@
     .template-card:hover {
       transform: scale(1.07) translateY(-10px) rotate(-1deg);
       box-shadow: 0 16px 40px rgba(118,75,162,0.22);
-      transition: transform 0.18s, box-shadow 0.18s;
     }
     @keyframes fadeInCard {
       to {
         opacity: 1;
         transform: none;
       }
+    }
+    .navbar-custom {
+      background: transparent;
+      backdrop-filter: none;
+      box-shadow: none;
+    }
+    .content-container {
+      margin-top: 100px;
+      z-index: 2;
+      position: relative;
+    }
+    .bounce {
+      animation: bounce 1.2s infinite alternate;
+    }
+    @keyframes bounce {
+      to { transform: translateY(-12px);}
+    }
+    .profile-icon img {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
     }
     .dropdown-menu {
       min-width: 260px;
@@ -69,72 +87,78 @@
       text-align: center;
       margin-bottom: 0.5rem;
     }
-    @keyframes bounce {
-      to { transform: translateY(-12px);}
+    /* Profile button hover effect */
+    .profile-icon:hover, .profile-icon:focus {
+      background-color: #f0f0f0 !important;
+      box-shadow: 0 2px 12px rgba(118,75,162,0.18) !important;
+      /* No transform or movement */
     }
-    .profile-icon:hover {
-      background-color: #e0e0e0;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
+
+    /* Prevent logo and profile button from moving on hover */
+    .navbar-brand:hover, .navbar-brand:focus,
+    .profile-icon:hover, .profile-icon:focus {
+      transform: none !important;
+      transition: background 0.2s, box-shadow 0.2s;
     }
   </style>
 </head>
 <body>
-  <!-- Animated background circles FIRST -->
-  <div class="bg-circle bg-circle1"></div>
-  <div class="bg-circle bg-circle2"></div>
-  <div class="bg-circle bg-circle3"></div>
-  <div class="bg-circle bg-circle4"></div>
-  <div class="bg-circle bg-circle5"></div>
-  <div class="bg-circle bg-circle6"></div>
 
-  <!-- Navbar NEXT -->
-  <nav class="navbar navbar-expand-lg" style="
-    position:static;
-    top:0;
-    z-index:100;
-    background: transparent;
-    box-shadow: none;
-    backdrop-filter: none;
-  ">
-    <div class="container-fluid">
-      <a class="navbar-brand fw-bold text-white" href="{{ url_for('home') }}">
-        <img src="{{ url_for('static', filename='logo3.png') }}" alt="Logo" style="height:36px;vertical-align:middle;margin-right:8px;">
-        Form Builder Pro
+   
+  <!-- Top Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top navbar-custom">
+    <div class="container-fluid px-4">
+      <a class="navbar-brand d-flex align-items-center" href="{{ url_for('home') }}">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" style="height: 50px; margin-right: 12px;">
+        <span class="fw-bold text-white fs-4">Form Builder Pro</span>
       </a>
-      <div class="d-flex align-items-center ms-auto">
+      <div class="ms-auto">
         {% if session.get('logged_in') %}
           <div class="dropdown ms-3">
-            <button class="btn btn-light rounded-circle d-flex align-items-center profile-icon" type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="box-shadow:0 2px 8px rgba(0,0,0,0.08);">
-              <span class="me-2 fw-semibold text-primary">{{ session.get('username', 'User')[0]|upper }}</span>
+            <button class="btn btn-light rounded-circle d-flex align-items-center profile-icon" type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="box-shadow:0 2px 8px rgba(0,0,0,0.08); padding: 0; width: 40px; height: 40px;">
+              <img src="{{ url_for('static', filename='avatar.png') }}" alt="Avatar">
             </button>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-              <li><span class="dropdown-item-text">Hi, {{ session.get('username', 'User') }}</span></li>
-              <li><a class="dropdown-item" href="{{ url_for('viewuser') }}">Profile</a></li>
+              <li class="text-center py-2">
+                <img src="{{ url_for('static', filename='avatar.png') }}" alt="Avatar" style="width: 56px; height: 56px; border-radius: 50%; margin-bottom: 6px;">
+                <div class="fw-semibold">{{ session.get('username', 'User') }}</div>
+                <div class="text-muted small">{{ session.get('email', 'user@email.com') }}</div>
+              </li>
               <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="{{ url_for('logout') }}">Sign out</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('viewuser') }}"><i class="bi bi-person me-2"></i>Profile</a></li>
+              <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Settings</a></li>
+              <li><a class="dropdown-item" href="#"><i class="bi bi-key me-2"></i>Change Password</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('allforms_view') }}"><i class="bi bi-ui-checks-grid me-2"></i>My Forms</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-danger" href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-right me-2"></i>Sign out</a></li>
             </ul>
           </div>
         {% else %}
-          <a href="{{ url_for('login') }}" class="btn btn-light rounded-pill px-4 fw-semibold ms-3" style="box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+          <a href="{{ url_for('login') }}" class="btn btn-light rounded-pill px-4 fw-semibold">
             <i class="bi bi-person-circle me-2"></i>Login
           </a>
         {% endif %}
       </div>
     </div>
   </nav>
-
-  <div class="container py-5 position-relative" style="z-index:2;">
+  <!-- Floating Background Circles -->
+  <div class="bg-circle bg-circle1"></div>
+  <div class="bg-circle bg-circle2"></div>
+  <div class="bg-circle bg-circle3"></div>
+  <div class="bg-circle bg-circle4"></div>
+  <div class="bg-circle bg-circle5"></div>
+  <div class="bg-circle bg-circle6"></div>
+  <!-- Main Content -->
+  <div class="container content-container">
     {% if session.get('logged_in') %}
-      <h2 class="text-white mb-4">Welcome back, {{ session.get('username', 'User') }}!</h2>
+      <h2 class="text-white mb-3">Welcome back, {{ session.get('username', 'User') }}!</h2>
     {% endif %}
-
     <h1 class="mb-4 text-white fw-bold">Welcome to Form Builder Pro</h1>
     <p class="lead text-white-50 mb-5">
       Form Builder Pro is a powerful and user-friendly web application that lets anyone create, share, and manage custom online forms—no coding required. Easily build forms with drag-and-drop, set field logic, collect responses, analyze results with charts, and export data. Perfect for surveys, registrations, feedback, and more.
     </p>
-   
-    <!-- Ready-made Templates Section -->
+
+    <!-- Templates Section -->
     <h3 class="mb-4 text-white">Start with a Template</h3>
     <div class="row g-4">
       <div class="col-12 col-sm-6 col-lg-4">
@@ -209,8 +233,53 @@
       </div>
     </div>
 
+    {% if session.get('logged_in') %}
+    <!-- Recent Forms -->
+    <h3 class="mb-3 text-white mt-5">Your Recent Forms</h3>
+    <div class="row g-4 mb-5">
+      {% for form in recent_forms %}
+        <div class="col-12 col-sm-6 col-lg-4">
+          <div class="template-card p-4 h-100" style="animation-delay:0.1s;">
+            <div class="mb-2 text-center">
+              <i class="bi bi-ui-checks-grid fs-1 text-primary"></i>
+            </div>
+            <h5 class="fw-semibold text-center mb-1">{{ form.title }}</h5>
+            {% if form.last_edited %}
+              <p class="text-muted text-center mb-2" style="font-size: 0.95em;">Last edited: {{ form.last_edited }}</p>
+            {% endif %}
+            <div class="d-flex justify-content-center">
+              <a href="{{ url_for('edit_form', form_id=form.id) }}" class="btn btn-outline-primary btn-sm">Open</a>
+            </div>
+          </div>
+        </div>
+      {% else %}
+        <div class="col-12 text-white-50">No recent forms yet.</div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <h3 class="mb-3 text-white mt-5">Public Forms</h3>
+    <div class="row g-4 mb-5">
+      {% for form in recent_forms %}
+        <div class="col-12 col-sm-6 col-lg-4">
+          <div class="template-card p-4 h-100" style="animation-delay:0.1s;">
+            <div class="mb-2 text-center">
+              <i class="bi bi-ui-checks-grid fs-1 text-primary"></i>
+            </div>
+            <h5 class="fw-semibold text-center mb-1">{{ form.title }}</h5>
+            <div class="d-flex justify-content-center">
+              <a href="{{ url_for('edit_form', form_id=form.id) }}" class="btn btn-outline-primary btn-sm">Open</a>
+            </div>
+          </div>
+        </div>
+      {% else %}
+        <div class="col-12 text-white-50">No public forms available.</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
     <!-- Features Section -->
-    <div class="row text-center mb-5 mt-5">
+    <h3 class="mb-4 mt-5 text-white">Why Choose Form Builder Pro?</h3>
+    <div class="row text-center mb-5">
       <div class="col-6 col-md-3 mb-3">
         <i class="bi bi-bar-chart-line fs-2 text-warning"></i>
         <div class="fw-semibold text-white">Analytics</div>
@@ -232,30 +301,12 @@
         <div class="text-white-50 small">Personalize your forms</div>
       </div>
     </div>
-
-    <!-- Your Recent Forms Section -->
-    <h3 class="mb-3 text-white mt-5">Your Recent Forms</h3>
-    <div class="row g-3 mb-5">
-      {% for form in recent_forms %}
-        <div class="col-12 col-md-6 col-lg-4">
-          <div class="card shadow-sm">
-            <div class="card-body">
-              <h6 class="card-title mb-1">{{ form.title }}</h6>
-              <p class="card-text text-muted mb-2" style="font-size: 0.95em;">Last edited: {{ form.last_edited }}</p>
-              <a href="{{ url_for('view_form', form_id=form.id) }}" class="btn btn-outline-primary btn-sm">Open</a>
-            </div>
-          </div>
-        </div>
-      {% else %}
-        <div class="col-12 text-white-50">No recent forms yet.</div>
-      {% endfor %}
-    </div>
   </div>
 
-  <!-- Floating Action Button -->
-  <a href="{{ url_for('firstpage') }}" class="btn btn-lg btn-primary rounded-circle shadow position-fixed"
+  <!-- Floating Create Button -->
+  <a href="{{ url_for('firstpage') }}" class="btn btn-lg btn-primary rounded-circle shadow position-fixed bounce"
      style="bottom: 40px; right: 40px; z-index: 20; width:64px; height:64px; display:flex; align-items:center; 
-     justify-content:center; font-size:2rem; animation:bounce 1.2s infinite alternate;">
+     justify-content:center; font-size:2rem;">
     <i class="bi bi-plus"></i>
   </a>
 
@@ -265,37 +316,30 @@
     <a href="#" class="text-white-50 text-decoration-underline">About</a> &middot;
     <a href="#" class="text-white-50 text-decoration-underline">Contact</a>
   </footer>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Card animation
-      document.querySelectorAll('.template-card').forEach(function(card, i) {
-        card.style.animationDelay = (0.1 + i * 0.12) + 's';
-        card.classList.add('fade-in');
-      });
-
-      // Profile dropdown open on hover
-      var profileBtn = document.getElementById('profileDropdown');
-      if (profileBtn) {
-        var dropdown = new bootstrap.Dropdown(profileBtn);
-        profileBtn.addEventListener('mouseenter', function() {
-          dropdown.show();
-        });
-        profileBtn.addEventListener('mouseleave', function() {
-          setTimeout(function() {
-            if (!profileBtn.matches(':hover') && !document.querySelector('.dropdown-menu:hover')) {
-              dropdown.hide();
-            }
-          }, 200);
-        });
-        var menu = document.querySelector('.dropdown-menu');
-        if (menu) {
-          menu.addEventListener('mouseleave', function() {
-            dropdown.hide();
-          });
-        }
+    // REMOVE or comment out this block if you don't want hover-to-open
+var profileBtn = document.getElementById('profileDropdown');
+if (profileBtn) {
+  var dropdown = new bootstrap.Dropdown(profileBtn);
+  profileBtn.addEventListener('mouseenter', function() {
+    dropdown.show();
+  });
+  profileBtn.addEventListener('mouseleave', function() {
+    setTimeout(function() {
+      if (!profileBtn.matches(':hover') && !document.querySelector('.dropdown-menu:hover')) {
+        dropdown.hide();
       }
+    }, 200);
+  });
+  var menu = document.querySelector('.dropdown-menu');
+  if (menu) {
+    menu.addEventListener('mouseleave', function() {
+      dropdown.hide();
     });
+  }
+}
   </script>
 </body>
 </html>

@@ -18,7 +18,7 @@
       font-family: 'Poppins', sans-serif;
       color: #333;
       min-height: 100vh;
-      padding-top: 3rem;
+      padding-top: 0rem;
       padding-bottom: 3rem;
     }
     .container {
@@ -38,6 +38,18 @@
 <body>
   {{ navbar|safe }}
   <div class="container mt-5">
+    <!-- Logo display added above response title -->
+    <div class="mb-3 d-flex flex-column align-items-start">
+      {% if logo_data %}
+        <img src="{{ logo_data }}" alt="Form Logo" class="rounded-circle mb-2" style="width:64px; height:64px; object-fit:cover;" />
+      {% else %}
+        <button id="logo-button" type="button" class="btn btn-outline-primary rounded-circle mb-2 d-flex align-items-center justify-content-center p-0 overflow-hidden" style="width: 64px; height: 64px; font-size: 2rem;" title="Add Logo to Your Form">
+          <i id="logo-icon" class="bi bi-image"></i>
+        </button>
+        <input type="file" id="logo-input" accept="image/*" style="display:none" />
+      {% endif %}
+      <small class="text-black-50">Form logo</small>
+    </div>
     <h1 class="mb-4">Response for Form: {{ form_title }}</h1>
     <div class="mb-3">
       <a href="{{ url_for('view_all_responses', form_id=form_id) }}" class="btn btn-secondary me-2">
@@ -71,6 +83,39 @@
     </div>
     {% endif %}
   </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const logoButton = document.getElementById('logo-button');
+      const logoInput = document.getElementById('logo-input');
+      const logoIcon = document.getElementById('logo-icon');
+
+      logoButton.addEventListener('click', function() {
+        logoInput.click();
+      });
+
+      logoInput.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file && file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            // Remove icon and show image preview
+            logoButton.innerHTML = '';
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.objectFit = 'cover';
+            logoButton.appendChild(img);
+          };
+          reader.readAsDataURL(file);
+        } else {
+          // If not an image, reset to icon
+          logoButton.innerHTML = '';
+          logoButton.appendChild(logoIcon);
+        }
+      });
+    });
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
