@@ -262,8 +262,8 @@ def create_form():
     access = request.form.get("access", "private")
     logo_data = request.form.get("logo_data", "")
 
-    # Keep only debug flash message for create_form received form_title
-    flash(f"Debug: create_form received form_title = {form_title}", "info")
+    # Remove debug flash message for create_form received form_title
+    # flash(f"Debug: create_form received form_title = {form_title}", "info")
 
     if not form_fields:
         flash("Cannot create a form without any fields.", "danger")
