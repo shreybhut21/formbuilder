@@ -262,8 +262,8 @@ def create_form():
     access = request.form.get("access", "private")
     logo_data = request.form.get("logo_data", "")
 
-    # Remove debug flash message for create_form received form_title
-    # flash(f"Debug: create_form received form_title = {form_title}", "info")
+    # Keep only debug flash message for create_form received form_title
+    flash(f"Debug: create_form received form_title = {form_title}", "info")
 
     if not form_fields:
         flash("Cannot create a form without any fields.", "danger")
@@ -307,7 +307,7 @@ def create_form():
 def inject_navbar():
     username = session.get("username", "Guest")
     navbar = f'''
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm" style="position:sticky;top:0;z-index:100;">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm" style="position:static;top:0;z-index:100;">
       <div class="container-fluid">
         <a class="navbar-brand fw-bold text-primary" href="{url_for('home')}">
           <img src="{url_for('static', filename='logo.png')}" alt="Logo" style="height:36px;vertical-align:middle;margin-right:8px;">
