@@ -1,0 +1,127 @@
+{
+    "intents": {
+        "greeting": {
+            "patterns": [
+                "hello",
+                "hi",
+                "hey",
+                "good morning",
+                "good afternoon",
+                "good evening"
+            ],
+            "responses": [
+                "Hello! How can I help you?"
+            ]
+        },
+        "product_info": {
+            "patterns": [
+                "product",
+                "feature",
+                "offer",
+                "pricing",
+                "plan",
+                "trial"
+            ],
+            "responses": [
+                "We offer a range of amazing products. Check our Products section."
+            ]
+        },
+        "form_help": {
+            "patterns": [
+                "form",
+                "create",
+                "template",
+                "edit",
+                "share",
+                "response",
+                "submit"
+            ],
+            "responses": [
+                "You can create or customize forms from the dashboard."
+            ]
+        },
+        "account_help": {
+            "patterns": [
+                "login",
+                "register",
+                "sign in",
+                "sign up",
+                "profile",
+                "password",
+                "account"
+            ],
+            "responses": [
+                "You can manage your account, update profile, or change password from your user settings."
+            ]
+        },
+        "thanks": {
+            "patterns": [
+                "thank",
+                "thanks",
+                "thx"
+            ],
+            "responses": [
+                "You\u2019re welcome!"
+            ]
+        },
+        "next_steps": {
+            "patterns": [
+                "then what",
+                "what next",
+                "what now",
+                "what do i do"
+            ],
+            "responses": [
+                "You can try creating a new form or explore templates to get started."
+            ]
+        },
+        "about": {
+            "patterns": [
+                "about",
+                "about us",
+                "who are you",
+                "what is this"
+            ],
+            "responses": [
+                "Form Builder Pro is a powerful and user-friendly web application to create and manage custom online forms."
+            ]
+        },
+        "help_contact": {
+            "patterns": [
+                "help",
+                "support",
+                "contact",
+                "email",
+                "phone",
+                "number"
+            ],
+            "responses": [
+                "You can contact us at support@formbuilderpro.com or call +1-800-123-4567."
+            ]
+        },
+        "form_suggestion": {
+            "patterns": [
+                "create form for",
+                "form for",
+                "need form for",
+                "want form for"
+            ],
+            "responses": [
+                "Based on your purpose, I suggest including fields like text, email, password, date, checkbox, and dropdown."
+            ]
+        },
+        "data_view": {
+            "patterns": [
+                "view data",
+                "see my data",
+                "view forms",
+                "download csv",
+                "see stats",
+                "share form"
+            ],
+            "responses": [
+                "You can view all your forms, download CSV exports, see statistics, and share your forms from your dashboard."
+            ]
+        }
+    }
+}

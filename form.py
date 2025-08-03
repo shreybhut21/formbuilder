@@ -13,6 +13,12 @@ import os
 import json
 import time
 from datetime import datetime
+import requests
+import smtplib
+from email.mime.text import MIMEText
+
+from werkzeug.utils import secure_filename
+from chatbot import Chatbot
 
 # -----------------------------------------------------------------------------
 # Configuration and Setup
@@ -46,6 +52,7 @@ def reset():
     for key in ("form_fields", "form_title", "form_description", "user_name", "editing_form_id"):
         session.pop(key, None)
     return redirect(url_for("firstpage"))
+        
 
 def init_db():
     """Create the submissions and user tables (if not exists)."""
@@ -77,6 +84,15 @@ def init_db():
     
 init_db()
 
+chatbot = Chatbot()
+
+@app.route('/chat', methods=['POST'])
+def chat():
+    data = request.get_json()
+    message = data.get('message', '')
+    reply = chatbot.get_response(message)
+    return jsonify({'reply': reply})
+    
 # Removed add_test_user function as per user request to avoid automatic test user insertion
 # def add_test_user():
 #     retries = 5
@@ -865,6 +881,14 @@ def submit_form():
     form_structure = json.loads(request.form.get("form_structure", "[]"))
     form_id = int(request.form.get("form_id", 0))
 
+    # Create a directory for uploads if it doesn't exist
+    # Each form gets its own upload sub-directory
+    UPLOAD_FOLDER = os.path.join(app.root_path, 'uploads', str(form_id))
+    try:
+        os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    except OSError as e:
+        flash(f"Could not create upload directory: {e}", "danger")
+        return redirect(request.referrer or url_for('formmaker_view', form_id=form_id))
     # Removed debug flash message
 
     # Server-side input validation
@@ -914,6 +938,20 @@ def submit_form():
     for field in form_structure:
         fname = field.get("name")
         if fname and fname in data:
+            if field.get("type") == "file":
+                if fname in request.files:
+                    file = request.files[fname]
+                    if file and file.filename != '':
+                        # Secure the filename and save the file with a unique prefix
+                        import uuid
+                        filename = secure_filename(file.filename)
+                        unique_filename = f"{uuid.uuid4().hex}_{filename}"
+                        file_path = os.path.join(UPLOAD_FOLDER, unique_filename)
+                        file.save(file_path)
+                        # Store the unique filename in the database
+                        filtered_dynamic_fields[fname] = unique_filename
+                continue # Move to next field
+
             if field.get("type") == "checkbox":
                 # Join multiple checkbox values as comma-separated string
                 values = data.get(fname, [])
@@ -950,6 +988,9 @@ def submit_form():
         c.execute(f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})", values)
 
         conn.commit()
+
+    # Send webhook notification
+    send_webhook(form_id, filtered_dynamic_fields)
 
     flash("Form submitted successfully!", "success")
     shared = request.form.get("shared", "0")
@@ -1526,6 +1567,16 @@ def verify_password(uid):
         else:
             return {"success": False, "message": "Current password is incorrect."}, 401
             
+@app.route("/google_login")
+def google_login():
+    flash("Google login is not implemented yet.", "warning")
+    return redirect(url_for("login"))
+
+@app.route("/github_login")
+def github_login():
+    flash("GitHub login is not implemented yet.", "warning")
+    return redirect(url_for("login"))
+            
 @app.route("/edit_user_info/<int:uid>", methods=["GET", "POST"])
 def edit_user_info(uid):
     with get_db() as conn:
@@ -1554,48 +1605,48 @@ def edit_user_info(uid):
             if not (current_password and new_password and confirm_password):
                 flash("All password fields are required for password change.", "danger")
                 return render_template("edit_user_info.html", user=user)
-            if new_password != confirm_password:
-                flash("New password and confirmation do not match.", "danger")
-                return render_template("edit_user_info.html", user=user)
-            # Verify current password
-            if current_password != user.get("password", ""):
-                flash("Current password is incorrect.", "danger")
-                return render_template("edit_user_info.html", user=user)
+        if new_password != confirm_password:
+            flash("New password and confirmation do not match.", "danger")
+            return render_template("edit_user_info.html", user=user)
+        # Continue with the rest of the function logic here
 
-        with get_db() as conn:
-            c = conn.cursor()
-            # Check if email is already registered to another user
-            print(f"Debug edit_user_info route: Checking email uniqueness for email: '{email.lower().strip()}', uid: {uid}")
-            c.execute("SELECT uid FROM user WHERE LOWER(TRIM(email))=? AND uid!=?", (email.lower().strip(), uid))
-            existing_user = c.fetchone()
-            print(f"Debug edit_user_info route: existing_user found: {existing_user}")
-            if existing_user:
-                flash("Email already registered. Please use a different email.", "warning")
-                return render_template("edit_user_info.html", user=user)
-            try:
-                if new_password:
-                    c.execute("UPDATE user SET name=?, email=?, phone=?, password=? WHERE uid=?", (name, email, phone, new_password, uid))
-                else:
-                    c.execute("UPDATE user SET name=?, email=?, phone=? WHERE uid=?", (name, email, phone, uid))
-                conn.commit()
-                flash("User updated successfully.", "success")
-                # Update session username if the edited user is the logged-in user
-                if session.get("logged_in") and session.get("username") != name and session.get("email") == email:
-                    session["username"] = name
-                return redirect(url_for("viewuser"))
-            except Exception as e:
-                flash(f"Error updating user: {e}", "danger")
-                return render_template("edit_user_info.html", user=user)
-                    
-    return render_template("edit_user_info.html", user=user)
-                    
-def update_user_name(uid, new_name):
-    """Update the name of a user by uid."""
-    with get_db() as conn:
-        c = conn.cursor()
-        c.execute("UPDATE user SET name=? WHERE uid=?", (new_name, uid))
-        conn.commit()
-                    
+def send_webhook(form_id, data):
+    # Webhook URL - in a real application, this should be configurable
+    webhook_url = "https://your-webhook-url.com/endpoint"
+    
+    # Skip webhook if URL is not configured
+    if not webhook_url or webhook_url == "https://your-webhook-url.com/endpoint":
+        return
+    
+    payload = {
+        "form_id": form_id,
+        "data": data
+    }
+    try:
+        response = requests.post(webhook_url, json=payload, timeout=5)
+        # Log success if needed
+        print(f"Webhook sent successfully: {response.status_code}")
+    except Exception as e:
+        print(f"Webhook failed: {e}")
+
+def send_email_notification(to_email, subject, body):
+    smtp_server = "smtp.gmail.com"
+    smtp_port = 587
+    smtp_user = "your_email@gmail.com"
+    smtp_pass = "your_app_password"
+    msg = MIMEText(body)
+    msg["Subject"] = subject
+    msg["From"] = smtp_user
+    msg["To"] = to_email
+    try:
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        server.starttls()
+        server.login(smtp_user, smtp_pass)
+        server.sendmail(smtp_user, [to_email], msg.as_string())
+        server.quit()
+    except Exception as e:
+        print(f"Email failed: {e}")
+
 @app.route("/statistics/<int:form_id>", methods=["GET"], endpoint="statistics")
 def statistics(form_id):
     with get_db() as conn:
@@ -1703,12 +1754,13 @@ def statistics(form_id):
                            form_id=form_id,
                            form_title=form_title,
                            stats=stats,
-                           chart_data=json.dumps(chart_data))
+                           chart_data=chart_data)
+                    
 @app.route("/delete_confirmation/<int:form_id>", methods=["GET"], endpoint="delete_confirmation")
 def delete_confirmation(form_id):
     # Render a confirmation page for deleting a form
     return render_template("delete.html", form_id=form_id)
-
+    
 @app.route("/delete_form/<int:form_id>", methods=["POST"], endpoint="delete_form")
 def delete_form(form_id):
     with get_db() as conn:
@@ -1718,42 +1770,86 @@ def delete_form(form_id):
         conn.commit()
     flash("Form deleted successfully.", "success")
     return redirect(url_for("allforms_view"))
-    
+
+@app.route("/update_branding/<int:form_id>", methods=["POST"])
+def update_branding(form_id):
+    logo = request.files.get("logo")
+    theme_color = request.form.get("theme_color", "#764ba2")
+    logo_data = None
+    if logo:
+        logo_data = logo.read()
+    with get_db() as conn:
+        c = conn.cursor()
+        c.execute("UPDATE submissions SET logo_data=? WHERE id=?", (logo_data, form_id))
+        conn.commit()
+    flash("Branding updated.", "success")
+    return redirect(url_for("formmaker_view", form_id=form_id))
+        
+@app.route("/set_schedule/<int:form_id>", methods=["POST"])
+def set_schedule(form_id):
+    open_date = request.form.get("open_date")
+    close_date = request.form.get("close_date")
+    with get_db() as conn:
+        c = conn.cursor()
+        c.execute("UPDATE submissions SET open_date=?, close_date=? WHERE id=?", (open_date, close_date, form_id))
+        conn.commit()
+    flash("Form schedule updated.", "success")
+    return redirect(url_for("edit_form", form_id=form_id))
+
+
+@app.route("/bulk_response_action/<int:form_id>", methods=["POST"])
+def bulk_response_action(form_id):
+    action = request.form.get("action")
+    selected_ids = request.form.getlist("selected_ids")
+    table_name = f"form_{form_id}_responses"
+    with get_db() as conn:
+        c = conn.cursor()
+        if action == "delete":
+            for rid in selected_ids:
+                c.execute(f"DELETE FROM {table_name} WHERE id=?", (rid,))
+            conn.commit()
+            flash(f"Deleted {len(selected_ids)} responses.", "success")
+        elif action == "export":
+            # Export logic (CSV)
+            import csv
+            from flask import make_response
+            c.execute(f"SELECT * FROM {table_name} WHERE id IN ({','.join(['?']*len(selected_ids))})", selected_ids)
+            rows = c.fetchall()
+            si = []
+            if rows:
+                headers = rows[0].keys()
+                si.append(','.join(headers))
+                for row in rows:
+                    si.append(','.join(str(row[h]) for h in headers))
+            output = '\n'.join(si)
+            response = make_response(output)
+            response.headers["Content-Disposition"] = "attachment; filename=responses.csv"
+            response.headers["Content-type"] = "text/csv"
+            return response
+    return redirect(url_for("view_all_responses", form_id=form_id))
+                    
 @app.route('/export_csv/<int:form_id>')
 def export_csv(form_id):
-    conn = get_db()
-    c = conn.cursor()
-    c.execute("SELECT form_title, form_structure FROM submissions WHERE id=?", (form_id,))
-    row = c.fetchone()
-    if not row:
-        return "Form not found", 404
-    form_structure = json.loads(row['form_structure'])
-    field_names = [field['name'] for field in form_structure if 'name' in field]
-
-    # Get all responses for this form
-    try:
-        c.execute(f"SELECT {', '.join(field_names)} FROM 'form_{form_id}_responses'")
-        responses = c.fetchall()
-    except Exception as e:
-        return f"Error fetching responses: {str(e)}", 500
-
-    def generate():
-        import io
-        si = io.StringIO()
-        writer = csv.writer(si)
-        writer.writerow(field_names)
-        for resp in responses:
-            writer.writerow([resp[field] for field in field_names])
-        output = si.getvalue()
-        si.close()
-        return output
-
-    csv_data = generate()
-    return Response(
-        csv_data,
-        mimetype="text/csv",
-        headers={"Content-Disposition": f"attachment;filename=form_{form_id}_responses.csv"}
-    )
+    import csv
+    from flask import make_response
+    with get_db() as conn:
+        c = conn.cursor()
+        if form_id == 0:
+            c.execute("SELECT * FROM submissions")
+        else:
+            c.execute("SELECT * FROM submissions WHERE id=?", (form_id,))
+        rows = c.fetchall()
+        si = []
+        if rows:
+            headers = rows[0].keys()
+            si.append(','.join(headers))
+            for row in rows:
+                si.append(','.join(str(row[h]) for h in headers))
+        output = '\n'.join(si)
+        response = make_response(output)
+        response.headers["Content-Disposition"] = "attachment; filename=forms.csv"
+        response.headers["Content-type"] = "text/csv"
+        return response
 
 if __name__ == "__main__":
     import os

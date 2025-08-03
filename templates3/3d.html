@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>3D Character Only</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      height: 100%;
+      width: 100%;
+      background: #ac46e3;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    #three-container {
+      width: 100vw;
+      height: 100vh;
+      display: block;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.154.0/build/three.min.js"></script>
+</head>
+<body>
+  <div id="three-container"></div>
+  <script>
+    const container = document.getElementById('three-container');
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 1.2, 6);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(renderer.domElement);
+
+    // Lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+    scene.add(ambientLight);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    directionalLight.position.set(5, 10, 7.5);
+    scene.add(directionalLight);
+
+    // Simple Man Model
+    // Head
+    const headGeometry = new THREE.SphereGeometry(0.4, 32, 32);
+    const headMaterial = new THREE.MeshStandardMaterial({ color: 0xffe0bd });
+    const head = new THREE.Mesh(headGeometry, headMaterial);
+    head.position.y = 2.1;
+    scene.add(head);
+
+    // Body
+    const bodyGeometry = new THREE.CylinderGeometry(0.35, 0.35, 1.1, 32);
+    const bodyMaterial = new THREE.MeshStandardMaterial({ color: 0xcccccc });
+    const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+    body.position.y = 1.2;
+    scene.add(body);
+
+    // Left Arm
+    const leftArmGeometry = new THREE.CylinderGeometry(0.13, 0.13, 0.8, 32);
+    const leftArmMaterial = new THREE.MeshStandardMaterial({ color: 0xffe0bd });
+    const leftArm = new THREE.Mesh(leftArmGeometry, leftArmMaterial);
+    leftArm.position.set(-0.55, 1.5, 0);
+    leftArm.rotation.z = Math.PI / 6;
+    scene.add(leftArm);
+
+    // Right Arm
+    const rightArm = leftArm.clone();
+    rightArm.position.set(0.55, 1.5, 0);
+    rightArm.rotation.z = -Math.PI / 6;
+    scene.add(rightArm);
+
+    // Left Leg
+    const leftLegGeometry = new THREE.CylinderGeometry(0.15, 0.15, 1, 32);
+    const leftLegMaterial = new THREE.MeshStandardMaterial({ color: 0x222222 });
+    const leftLeg = new THREE.Mesh(leftLegGeometry, leftLegMaterial);
+    leftLeg.position.set(-0.22, 0.2, 0);
+    scene.add(leftLeg);
+
+    // Right Leg
+    const rightLeg = leftLeg.clone();
+    rightLeg.position.set(0.22, 0.2, 0);
+    scene.add(rightLeg);
+
+    // Animation (simple idle sway)
+    let t = 0;
+    function animate() {
+      requestAnimationFrame(animate);
+      t += 0.02;
+      head.rotation.y = Math.sin(t) * 0.2;
+      body.rotation.y = Math.sin(t) * 0.2;
+      leftArm.rotation.x = Math.sin(t) * 0.2;
+      rightArm.rotation.x = -Math.sin(t) * 0.2;
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // Responsive resize
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>

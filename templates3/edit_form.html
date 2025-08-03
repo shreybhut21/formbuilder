@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -117,6 +117,26 @@
       {% endfor %}
       <button type="submit" class="btn btn-primary">Save Changes</button>
       <a href="{{ url_for('view_response', form_id=form_id, response_id=response_id) }}" class="btn btn-secondary">Cancel</a>
+    </form>
+    <div class="mb-4">
+      <h5>Invite Collaborators</h5>
+      <form method="POST" action="{{ url_for('invite_collaborator', form_id=form_id) }}">
+        <div class="input-group">
+          <input type="email" name="collaborator_email" class="form-control" placeholder="Collaborator's email" required>
+          <select name="role" class="form-select">
+            <option value="editor">Editor</option>
+            <option value="viewer">Viewer</option>
+          </select>
+          <button class="btn btn-primary" type="submit">Invite</button>
+        </div>
+      </form>
+    </div>
+    <form method="POST" action="{{ url_for('set_schedule', form_id=form_id) }}">
+      <label>Open Date:</label>
+      <input type="datetime-local" name="open_date" class="form-control mb-2">
+      <label>Close Date:</label>
+      <input type="datetime-local" name="close_date" class="form-control mb-2">
+      <button class="btn btn-outline-primary" type="submit">Save Schedule</button>
     </form>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

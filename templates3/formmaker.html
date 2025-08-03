@@ -269,6 +269,18 @@
     </div>
   </div>
 
+  <form method="POST" enctype="multipart/form-data" action="{{ url_for('update_branding', form_id=form_id) }}">
+    <div class="mb-3">
+      <label for="logo" class="form-label">Upload Logo</label>
+      <input type="file" class="form-control" id="logo" name="logo">
+    </div>
+    <div class="mb-3">
+      <label for="theme_color" class="form-label">Theme Color</label>
+      <input type="color" class="form-control form-control-color" id="theme_color" name="theme_color" value="#764ba2">
+    </div>
+    <button type="submit" class="btn btn-primary">Save Branding</button>
+  </form>
+
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       const logoButton = document.getElementById('logo-button');

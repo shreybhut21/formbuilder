@@ -1,0 +1,33 @@
+User: hey
+Bot: Sorry, I didn't understand that. Can you please rephrase?
+
+User: hi
+Bot: Sorry, I didn't understand that. Can you please rephrase?
+
+User: hi
+Bot: Hello! How can I help you?
+
+User: what you can do
+Bot: You can try creating a new form or explore templates to get started.
+
+User: view data
+Bot: You can view all your forms, download CSV exports, see statistics, and share your forms from your dashboard.
+
+User: feature
+Bot: We offer a range of amazing products. Check our Products section.
+
+User: i forgot my password
+Bot: You can manage your account, update profile, or change password from your user settings.
+
+User: who are you
+Bot: Form Builder Pro is a powerful and user-friendly web application to create and manage custom online forms.
+
+User: hi
+Bot: Hello! How can I help you?
+
+User: what
+Bot: You can try creating a new form or explore templates to get started.
+
+User: form
+Bot: Based on your purpose, I suggest including fields like text, email, password, date, checkbox, and dropdown.
+
